@@ -19,7 +19,7 @@ class Device(models.Model):
     xdegree = models.FloatField(default=0)
     ydegree = models.FloatField(default=0)
     zdegree = models.FloatField(default=0)
-    time = models.DateTimeField(auto_now_add=True)
+    time = models.DateTimeField()
 
     class Meta:
         ordering = ('time',)
@@ -27,7 +27,14 @@ class Device(models.Model):
     def __str__(self):
         return self.device_id
 
+class PostureData(models.Model): #collect posture data
+    device = models.ForeignKey(Device, on_delete=models.DO_NOTHING)
+    count = models.IntegerField(default=0)
+    start_date = models.DateField()
+    end_date = models.DateField()
 
+    class Meta:
+        ordering = ('device',)
 
 class Snippet(models.Model):
     created = models.DateTimeField(auto_now_add=True)
