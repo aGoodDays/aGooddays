@@ -5,13 +5,14 @@ from posture.models import Device, Snippet, LANGUAGE_CHOICES, STYLE_CHOICES
 class SnippetSerializer(serializers.ModelSerializer):
     class Meta:
         model = Snippet
-        fields = ('id', 'title', 'code', 'linenos', 'language', 'style')
+        fields = '__all__'#('id', 'title', 'code', 'linenos', 'language', 'style')
 
 
 class DeviceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Device
-        fields = ('device_id', 'saX', 'saY', 'saZ', 'sgX', 'sgY', 'sgZ', 'xdegree', 'ydegree', 'zdegree')
+        fields = '__all__'
+        lookup_field = 'device_id'
 
 '''
 class SnippetSerializer(serializers.Serializer):

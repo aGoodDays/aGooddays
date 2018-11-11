@@ -1,9 +1,13 @@
 from django.urls import path
 from posture import views
+from rest_framework.urlpatterns import format_suffix_patterns
 
 
 urlpatterns = [
-    path('posture/<str:device_id>/', views.device_connect_data),
-    
-    #path('posture/<int:pk>/', views.snippet    _detail),
+    path('snippets/', views.SnippetList.as_view()),
+    path('snippets/<int:pk>/', views.SnippetDetail.as_view()),
+    path('posture/<str:device_id>/',  views.DeviceDetail.as_view()),
+    path('posture/<str:device_id>/?start_date=<int:start_date>&end_date=<int:end_date>', views.DeviceSearchDate.as_view()),
 ]
+
+urlpatterns = format_suffix_patterns(urlpatterns)
