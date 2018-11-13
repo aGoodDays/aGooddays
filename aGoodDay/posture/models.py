@@ -19,10 +19,10 @@ class Device(models.Model):
     xdegree = models.FloatField(default=0)
     ydegree = models.FloatField(default=0)
     zdegree = models.FloatField(default=0)
-    time = models.DateTimeField()
+    date = models.DateField(auto_now_add=True)
 
     class Meta:
-        ordering = ('time',)
+        ordering = ('date',)
     
     def __str__(self):
         return self.device_id

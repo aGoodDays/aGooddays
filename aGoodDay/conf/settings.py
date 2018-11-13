@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 
 import os
 
+
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -127,10 +129,10 @@ LANGUAGE_CODE = 'ko-kr'
 TIME_ZONE = 'Asia/Seoul'
 
 USE_I18N = True
+DATETIME_FORMAT = '%Y-%m-%d'
+USE_L10N = False#True
 
-USE_L10N = True
-
-USE_TZ = True
+USE_TZ = False  #True
 
 
 # Static files (CSS, JavaScript, Images)
@@ -138,3 +140,58 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
+# logging
+LOGGING = {
+    'version': 1,
+    # 기존의 로깅 설정을 비활성화 할 것인가?
+    'disable_existing_loggers': False,
+
+    # 포맷터
+    # 로그 레코드는 최종적으로 텍스트로 표현됨
+    # 이 텍스트의 포맷 형식 정의
+    # 여러 포맷 정의 가능
+    'formatters': {
+        'format1': {
+            'format': '[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s',
+            'datefmt': '%d/%b/%Y %H:%M:%S'
+        },
+        'format2': {
+            'format': '%(levelname)s %(message)s'
+        },
+    },
+
+    # 핸들러
+    # 로그 레코드로 무슨 작업을 할 것인지 정의
+    # 여러 핸들러 정의 가능
+    'handlers': {
+        # 로그 파일을 만들어 텍스트로 로그레코드 저장
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, 'logs/logfile'),
+            'formatter': 'format1',
+        },
+        # 콘솔(터미널)에 출력
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'format2',
+        }
+    },
+
+    # 로거
+    # 로그 레코드 저장소
+    # 로거를 이름별로 정의
+    'loggers': {
+        'polls': {
+            'handlers': ['file'],
+            'level': 'DEBUG',
+        },
+        'books': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+        }
+    },
+
+}

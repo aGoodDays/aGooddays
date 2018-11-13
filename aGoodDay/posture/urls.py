@@ -7,7 +7,7 @@ urlpatterns = [
     path('snippets/', views.SnippetList.as_view()),
     path('snippets/<int:pk>/', views.SnippetDetail.as_view()),
     path('posture/<str:device_id>/',  views.DeviceDetail.as_view()),
-    path('posture/<str:device_id>/?start_date=<int:start_date>&end_date=<int:end_date>', views.DeviceSearchDate.as_view()),
+ 
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)

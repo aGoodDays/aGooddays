@@ -9,14 +9,21 @@ from django.http import Http404
 from rest_framework.views import APIView
 from rest_framework import mixins, generics
 
+import logging
+logger = logging.getLogger(__name__)
 
 class DeviceDetail(generics.ListAPIView):
-    queryset = Device.objects.all()
+    #queryset = Device.objects.all()
     serializer_class = DeviceSerializer
 
-class DeviceSearchDate(generics.ListAPIView):
-    queryset = Device.objects.all()
-    serializer_class = DeviceSerializer
+    def get_queryset(self, start_date=None, end_date=None):
+        device_id = self.kwargs['device_id']
+        start_date = self.request.GET.get('start_date')
+        end_date = self.request.GET.get('end_date')
+        if (start_date is None or end_date is None):
+            return Device.objects.filter(device_id=device_id)
+        else:
+            return Device.objects.filter(device_id=device_id, date__range=[start_date, end_date])
 
 class SnippetList(generics.ListCreateAPIView):
 
