@@ -25,6 +25,8 @@ class DeviceDetail(generics.ListAPIView):
         else:
             return Device.objects.filter(device_id=device_id, date__range=[start_date, end_date])
 
+            
+
 class SnippetList(generics.ListCreateAPIView):
 
     queryset = Snippet.objects.all()
