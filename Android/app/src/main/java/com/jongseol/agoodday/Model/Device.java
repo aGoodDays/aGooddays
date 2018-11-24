@@ -3,6 +3,11 @@ package com.jongseol.agoodday.Model;
 import com.google.gson.annotations.SerializedName;
 import java.util.Date;
 
+/**
+ * @file jongseol.agoodday.Model.Device.java
+ * @brief Device Data Model. used SerializedName Annotation
+ * @author jeje(las9897@gmail.com)
+ */
 public class Device {
 
     @SerializedName("device_id")
@@ -30,7 +35,10 @@ public class Device {
     @SerializedName("zdegree")
     public float zdegree;
 
-
+    /**
+     * @brief Constructor For Test
+     * @param device_id
+     */
     public Device(String device_id) {
         this.device_id = device_id;
         this.posture = 0;

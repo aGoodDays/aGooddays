@@ -9,17 +9,29 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+/**
+ * @file jongseol.agoodday.ConnectActivity.java
+ * @brief bluetooth connect and get device_id
+ * @author jeje(las9897@gmail.com)
+ * @see A Bluetooth connection module is required
+ */
 public class ConnectActivity extends AppCompatActivity {
 
-    private static final String TAG = "BluetoothService2";
+    //Constant Variable
+    private static final String TAG = "ConnetActivity";
     private static final int REQUEST_CONNECT_DEVICE = 1;
     private static final int REQUEST_ENABLE_BT = 2;
 
+    //View Variable
     private EditText device_id;
     private Button btn_commit, btn_bluetooth;
     private TextView result;
 
 
+    /**
+     * @brief Activity Setting and Init Variable
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -30,6 +42,9 @@ public class ConnectActivity extends AppCompatActivity {
         btn_bluetooth = (Button) findViewById(R.id.connect_btn_bluetooth);
 
 
+        /**
+         * @brief Button btn_commit click event listener. send device_id to MainActivity.java
+         */
         btn_commit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

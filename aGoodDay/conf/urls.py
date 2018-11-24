@@ -16,8 +16,13 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
+"""
+@file aGoodDay.conf.urls
+@brief URL mapping
+@author jeje(las9897@gmail.com)
+"""
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('posture.urls')),
-    path('rest_api/', include('rest_framework.urls')),
 ]

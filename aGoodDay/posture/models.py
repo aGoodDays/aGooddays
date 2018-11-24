@@ -1,6 +1,14 @@
 from django.db import models
 
 
+"""
+@file   aGoodDay.posture.models
+@brief  Data class used to collect or display data 
+        The primary key is omitted, but exists as an id.
+        The device model is the data, the posture model is the processed data
+@author jeje(las9897@gmail.com)
+"""
+
 class Device(models.Model):
     device_id = models.CharField(max_length=10)
     posture = models.IntegerField(default=0)

@@ -14,9 +14,12 @@ import java.text.SimpleDateFormat;
 
 import java.util.List;
 
-
+/**
+ * @file jongseol.agoodday.Adapter.PostureListAdapter.java
+ * @brief Adapters that link data to be shown in the list.
+ * @author jeje (las9897@gmail.com)
+ */
 public class PostureListAdapter extends BaseAdapter {
-
 
     private Context context;
     private int layout;
@@ -24,6 +27,12 @@ public class PostureListAdapter extends BaseAdapter {
     private LayoutInflater inflater;
     private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd %HH:%mm");
 
+   /***
+    * @brief Constructor 
+    * @param context
+    * @param layout
+    * @param deviceList
+    */
     public PostureListAdapter(Context context, int layout, List<Device> deviceList) {
         this.context = context;
         this.layout = layout;
@@ -31,16 +40,30 @@ public class PostureListAdapter extends BaseAdapter {
         this.inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
-
+    /**
+     * @brief Inner Class \n
+     *        ViewHolder
+     */
     class ViewHolder {
         TextView device_id, saX, saY, saZ, sgX, sgY, sgZ, xdegree, ydegree, zdegree, date;
     }
 
+    /**
+     * @return int devicelist.size
+     */
     @Override
     public int getCount() {
         return deviceList.size();
     }
 
+
+    /**
+     * @brief Decrease findViewById count
+     * @param position
+     * @param convertView
+     * @param parent
+     * @return View converView
+     */
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
 
@@ -78,11 +101,21 @@ public class PostureListAdapter extends BaseAdapter {
         return convertView;
     }
 
+    /**
+     * 
+     * @param position
+     * @return object device
+     */
     @Override
     public Object getItem(int position) {
         return deviceList.get(position);
     }
 
+    /**
+     * 
+     * @param position
+     * @return position
+     */
     @Override
     public long getItemId(int position) {
         return position;
