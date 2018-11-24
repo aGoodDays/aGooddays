@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:id="@+id/main2_scrollview"
+    >
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:scrollbars="vertical"
+        tools:context=".main2Activity">
+
+
+        <TextView
+            android:id="@+id/main2_testview_id"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginStart="22dp"
+            android:layout_marginLeft="22dp"
+            android:layout_marginEnd="94dp"
+            android:layout_marginRight="94dp"
+            android:layout_toStartOf="@+id/main2_edittext_id"
+            android:layout_toLeftOf="@+id/main2_edittext_id"
+            android:text="ID"
+            android:textSize="30dp" />
+
+        <EditText
+            android:id="@+id/main2_edittext_id"
+            android:layout_width="251dp"
+            android:layout_height="wrap_content"
+            android:layout_alignStart="@+id/main2_button_get"
+            android:layout_alignLeft="@+id/main2_button_get"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginStart="-67dp"
+            android:layout_marginLeft="-67dp"
+            android:layout_marginEnd="55dp"
+            android:layout_marginRight="55dp"
+            android:text="" />
+
+        <TextView
+            android:id="@+id/main2_textview_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/main2_testview_id"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:layout_marginTop="11dp"
+            android:text="Date"
+            android:textSize="30dp" />
+
+        <EditText
+            android:id="@+id/main2_edittext_startdate"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@+id/main2_textview_wave"
+            android:layout_marginStart="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_toEndOf="@+id/main2_textview_date"
+            android:layout_toRightOf="@+id/main2_textview_date"
+            android:text="" />
+
+        <TextView
+            android:id="@+id/main2_textview_wave"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/main2_edittext_id"
+            android:layout_alignStart="@+id/main2_button_get"
+            android:layout_alignLeft="@+id/main2_button_get"
+            android:layout_alignBottom="@+id/main2_edittext_enddate"
+            android:layout_marginStart="53dp"
+            android:layout_marginLeft="53dp"
+            android:layout_marginTop="6dp"
+            android:layout_marginEnd="18dp"
+            android:layout_marginRight="18dp"
+            android:layout_marginBottom="3dp"
+            android:layout_toStartOf="@+id/main2_edittext_enddate"
+            android:layout_toLeftOf="@+id/main2_edittext_enddate"
+            android:text="~"
+            android:textSize="30dp" />
+
+        <EditText
+            android:id="@+id/main2_edittext_enddate"
+            android:layout_width="98dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginTop="50dp"
+            android:layout_marginEnd="50dp"
+            android:layout_marginRight="50dp"
+            android:text="" />
+
+        <Button
+            android:id="@+id/main2_button_get"
+            android:layout_width="106dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginStart="144dp"
+            android:layout_marginLeft="144dp"
+            android:layout_marginTop="110dp"
+            android:layout_marginEnd="134dp"
+            android:layout_marginRight="134dp"
+            android:text="Get" />
+
+
+        <ListView
+            android:scrollbars="none"
+            android:id="@+id/main2_listview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/main2_button_get"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="0dp"
+            android:layout_marginLeft="0dp"
+            android:layout_marginTop="2dp"
+            android:layout_marginEnd="0dp"
+            android:layout_marginRight="0dp"
+            android:layout_marginBottom="0dp"></ListView>
+
+        <Button
+            android:id="@+id/main2_button_post"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginStart="7dp"
+            android:layout_marginLeft="7dp"
+            android:layout_marginTop="106dp"
+            android:text="POST" />
+
+        <TextView
+            android:id="@+id/main2_textview_json"
+            android:layout_width="251dp"
+            android:layout_height="247dp"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginTop="162dp"
+            android:layout_marginEnd="7dp"
+            android:layout_marginRight="7dp"
+            android:layout_marginBottom="0dp" />
+
+        <Button
+            android:id="@+id/main2_button_sqlite"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@+id/main2_button_get"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginEnd="0dp"
+            android:layout_marginRight="0dp"
+            android:layout_marginBottom="1dp"
+            android:text="SQLite" />
+
+
+    </RelativeLayout>
+
+</ScrollView>

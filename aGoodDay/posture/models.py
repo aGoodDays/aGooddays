@@ -1,10 +1,4 @@
 from django.db import models
-from pygments.lexers import get_all_lexers
-from pygments.styles import get_all_styles
-
-LEXERS = [ item for item in get_all_lexers() if item[1]]
-LANGUAGE_CHOICES = sorted([(item[1][0], item[0]) for item in LEXERS])
-STYLE_CHOICES = sorted((item, item) for item in get_all_styles())
 
 
 class Device(models.Model):
@@ -19,7 +13,7 @@ class Device(models.Model):
     xdegree = models.FloatField(default=0)
     ydegree = models.FloatField(default=0)
     zdegree = models.FloatField(default=0)
-    date = models.DateField(auto_now_add=True)
+    date = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         ordering = ('date',)
@@ -30,20 +24,8 @@ class Device(models.Model):
 class PostureData(models.Model): #collect posture data
     device = models.ForeignKey(Device, on_delete=models.DO_NOTHING)
     count = models.IntegerField(default=0)
-    start_date = models.DateField()
-    end_date = models.DateField()
+    start_date = models.DateTimeField()
+    end_date = models.DateTimeField()
 
     class Meta:
         ordering = ('device',)
-
-class Snippet(models.Model):
-    created = models.DateTimeField(auto_now_add=True)
-    title = models.CharField(max_length=100, blank=True, default='')
-    code = models.TextField()
-    linenos = models.BooleanField(default=False)
-    language = models.CharField(choices=LANGUAGE_CHOICES, default='python', max_length=100)
-    style = models.CharField(choices=STYLE_CHOICES, default='friendly', max_length=100)
-
-    class Meta:
-        ordering = ('created',)
-
