@@ -3,7 +3,7 @@ from posture.models import Device, Posture
 from posture.serializers import DeviceSerializer, PostureSerializer
 from rest_framework import  generics, status, viewsets
 from rest_framework.response import Response
-from datetime import date, timedelta
+from datetime import datetime, timedelta
 
 
 
@@ -20,7 +20,7 @@ class DeviceDetail(generics.ListCreateAPIView):
     def get_queryset(self):
         device_id = self.kwargs['device_id']
         #today = self.request.GET.get('today')
-        today = date.today() + timedelta(days=1)
+        today = datetime.today() + timedelta(days=1)
         pre_day = today - timedelta(days=7)
         return Device.objects.filter(device_id=device_id, date__range=[pre_day, today])
         

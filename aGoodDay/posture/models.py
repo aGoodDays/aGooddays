@@ -10,8 +10,8 @@ from django.db import models
 """
 
 class Device(models.Model):
-    device_id = models.CharField(max_length=10)
-    posture = models.IntegerField(default=0)
+    device_id = models.IntegerField()
+    posture = models.FloatField(default=0)
     saX = models.FloatField(default=0)
     saY = models.FloatField(default=0)
     saZ = models.FloatField(default=0)

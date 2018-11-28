@@ -9,7 +9,7 @@ from posture.models import Device, Posture
 @author jeje(las9897@gmail.com)
 """
 class DeviceSerializer(serializers.ModelSerializer):
-    date = serializers.DateTimeField(format="%Y-%m-%d")
+    date = serializers.DateField(format="%Y-%m-%d")
     class Meta:
         model = Device
         fields = ('device_id', 'posture', 'saX', 'saY', 'saZ', 'sgX', 'sgY', 'sgZ', 'xdegree', 'ydegree', 'zdegree', 'date')
