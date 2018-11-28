@@ -3,7 +3,7 @@ from posture.models import Device, Posture
 from posture.serializers import DeviceSerializer, PostureSerializer
 from rest_framework import  generics, status, viewsets
 from rest_framework.response import Response
-from datetime import datetime, timedelta
+from datetime import date, timedelta
 
 
 
@@ -20,16 +20,16 @@ class DeviceDetail(generics.ListCreateAPIView):
     def get_queryset(self):
         device_id = self.kwargs['device_id']
         #today = self.request.GET.get('today')
-        today = datetime.today() + timedelta(days=1)
+        today = date.today() + timedelta(days=1)
         pre_day = today - timedelta(days=7)
         return Device.objects.filter(device_id=device_id, date__range=[pre_day, today])
         
-    def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data, many=isinstance(request.data,list))
-        serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
-        headers = self.get_success_headers(serializer.data)
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+    # def create(self, request, *args, **kwargs):
+    #     serializer = self.get_serializer(data=request.data, many=isinstance(request.data,list))
+    #     serializer.is_valid(raise_exception=True)
+    #     self.perform_create(serializer)
+    #     headers = self.get_success_headers(serializer.data)
+    #     return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
 """
 @brief  after receiving dataform from POST request, insert posture to MySQL.

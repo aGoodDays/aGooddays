@@ -45,7 +45,7 @@ public class Main2Activity extends AppCompatActivity {
         setContentView(R.layout.activity_main2);
 
 
-        device_id = "20181113";
+        device_id = "901180076";
         btn_get = (Button) findViewById(R.id.main2_btn_get);
         btn_put = (Button) findViewById(R.id.main2_btn_put);
         btn_test = (Button) findViewById(R.id.main2_btn_test);
@@ -103,7 +103,6 @@ public class Main2Activity extends AppCompatActivity {
                             posture.ratio = (float) posture.bad_count / posture.all_count;
                             postureArrayList.add(posture); // 마지막 객체 삽입
                             listView.setAdapter(postureListAdapter);
-                            vibrator.vibrate(1000);
                         }
                     }
 

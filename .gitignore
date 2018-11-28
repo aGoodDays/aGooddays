@@ -2,6 +2,7 @@
 # Custom
 myvenv/
 .vscode/
+Android/
 
 
 # Created by https://www.gitignore.io/api/c,java,python,django,android,database,androidstudio

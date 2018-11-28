@@ -44,7 +44,7 @@ public class BluetoothConnect extends AppCompatActivity implements View.OnClickL
             case R.id.bluetooth_connect_btn_test: {
                 intent = getIntent();
                 if (true) { // Bluetooth Connect
-                    device_id = "20181113";
+                    device_id = "901180076";
                     intent.putExtra("device_id", device_id);
                     setResult(BLUETOOTH_CONNECT_CODE, intent);
                     finish();

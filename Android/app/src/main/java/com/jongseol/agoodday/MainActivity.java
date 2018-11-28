@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.os.Vibrator;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -43,8 +44,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     //Vibrator
     private Vibrator vibrator;
 
-    private LinearLayout layout_bluetooth, layout_level, layout_controller;
-    private Button btn_connect, btn_level1, btn_level2, btn_level3, btn_on, btn_stop, btn_off, btn_sync, btn_test;
+    private LinearLayout layout_bluetooth, layout_level, layout_controller, layout_mode;
+    private Button btn_connect, btn_level1, btn_level2, btn_level3, btn_on, btn_stop, btn_off, btn_sync, btn_test, btn_server, btn_local, btn_view;
     private TextView textView_device_id, textView_test;
     private ListView listView;
 
@@ -90,7 +91,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         layout_bluetooth = (LinearLayout) findViewById(R.id.main_layout_bluetooth);
         layout_level = (LinearLayout) findViewById(R.id.main_layout_level);
         layout_controller = (LinearLayout) findViewById(R.id.main_layout_controller);
+        layout_mode = (LinearLayout) findViewById(R.id.main_layout_mode);
         btn_connect = (Button) findViewById(R.id.main_btn_connect);
+        btn_server = (Button) findViewById(R.id.main_btn_server);
+        btn_local = (Button) findViewById(R.id.main_btn_local);
         btn_level1 = (Button) findViewById(R.id.main_btn_level_1);
         btn_level2 = (Button) findViewById(R.id.main_btn_level_2);
         btn_level3 = (Button) findViewById(R.id.main_btn_level_3);
@@ -99,6 +103,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         btn_off = (Button) findViewById(R.id.main_btn_off);
         btn_sync = (Button) findViewById(R.id.main_btn_sync);
         btn_test = (Button) findViewById(R.id.main_btn_test);
+        btn_view = (Button) findViewById(R.id.main_btn_view);
         textView_device_id = (TextView) findViewById(R.id.main_textview_device_id);
         textView_test = (TextView) findViewById(R.id.main_textview_test);
         listView = (ListView) findViewById(R.id.main_listview);
@@ -111,6 +116,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         postureListAdapter = new PostureListAdapter(postureArrayList);
 
         //VISIBLE Setting
+        layout_mode.setVisibility(View.GONE);
         layout_level.setVisibility(View.GONE);
         layout_controller.setVisibility(View.GONE);
         listView.setVisibility(View.GONE);
@@ -125,6 +131,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         btn_stop.setOnClickListener(this);
         btn_sync.setOnClickListener(this);
         btn_test.setOnClickListener(this);
+        btn_server.setOnClickListener(this);
+        btn_local.setOnClickListener(this);
+        btn_view.setOnClickListener(this);
 
         //Bluetooth Setting
         bluetoothSPP = new BluetoothSPP(this);
@@ -136,21 +145,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         bluetoothSPP.setOnDataReceivedListener(new BluetoothSPP.OnDataReceivedListener() {
             @Override
             public void onDataReceived(byte[] data, String message) {
-                Toast.makeText(MainActivity.this, message, Toast.LENGTH_SHORT).show();
-               if (message == "bad") {
-                    vibrator.vibrate(1000);
+                if(message.contains("ID")){
+                    textView_device_id.setText(message.substring(2));
                 }
+                Log.d("receiver ", message);
+                vibrator.vibrate(100);
+
             }
         });
 
         bluetoothSPP.setBluetoothConnectionListener(new BluetoothSPP.BluetoothConnectionListener() {
             @Override
             public void onDeviceConnected(String name, String address) { //연결되었을 때
-                Toast.makeText(getApplicationContext(), "Connected " + name + "\n" + address, Toast.LENGTH_SHORT).show();
-                textView_device_id.setText(name);
                 btn_connect.setText("DISCONNECT");
                 CONNECT_STATE = true;
-                layout_level.setVisibility(View.VISIBLE);
+                btn_view.setVisibility(View.VISIBLE);
+                layout_mode.setVisibility(View.VISIBLE);
 
             }
 
@@ -160,6 +170,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 btn_connect.setText("CONNECT");
                 textView_device_id.setText("");
                 CONNECT_STATE = false;
+                layout_mode.setVisibility(View.GONE);
                 layout_controller.setVisibility(View.GONE);
                 layout_level.setVisibility(View.GONE);
             }
@@ -225,6 +236,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     btn_connect.setText("CONNECT");
                     textView_device_id.setText("");
                     CONNECT_STATE = false;
+                    layout_mode.setVisibility(View.GONE);
                     layout_controller.setVisibility(View.GONE);
                     layout_level.setVisibility(View.GONE);
                 } else {// 블루투스 연결 액티비티 이동
@@ -258,20 +270,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             for (JsonElement e : jsonArray) {
                                 if (!today.equals(e.getAsJsonObject().get("date").getAsString())) { // 오늘 날짜가 아니라면
                                     if (posture.all_count == 0)
-                                        posture.all_count = 1;
-                                    posture.ratio = (float) posture.bad_count / posture.all_count;
+                                        posture.ratio = 0;
+                                    else
+                                        posture.ratio = (float) posture.bad_count / posture.all_count;
                                     postureArrayList.add(posture); // list에 추가
                                     posture = new Posture(device_id, e.getAsJsonObject().get("date").getAsString()); // 새로운 객체 생성
                                     today = e.getAsJsonObject().get("date").getAsString();
                                 }
                                 posture.all_count++;
-                                if (e.getAsJsonObject().get("posture").getAsInt() == 1) {
+                                if (e.getAsJsonObject().get("posture").getAsInt() == 1 || e.getAsJsonObject().get("posture").getAsInt() == 2) {
                                     posture.bad_count++;
                                 }
                             }
                             if (posture.all_count == 0)
-                                posture.all_count = 1;
-                            posture.ratio = (float) posture.bad_count / posture.all_count;
+                                posture.ratio = 0;
+                            else
+                                posture.ratio = (float) posture.bad_count / posture.all_count;
                             postureArrayList.add(posture); // 마지막 객체 삽입
                             listView.setAdapter(postureListAdapter);
                         }
@@ -286,8 +300,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             }
             case R.id.main_btn_test: {
-                textView_device_id.setText("20181113");
+                textView_device_id.setText("901180076");
+                layout_mode.setVisibility(View.VISIBLE);
+                break;
+            }
+            case R.id.main_btn_server: {
+                bluetoothSPP.send("1", true);
+                layout_mode.setVisibility(View.GONE);
                 layout_level.setVisibility(View.VISIBLE);
+                break;
+            }
+            case R.id.main_btn_local: {
+                bluetoothSPP.send("2", true);
+                layout_mode.setVisibility(View.GONE);
+                layout_level.setVisibility(View.VISIBLE);
+                break;
+            }
+            case R.id.main_btn_view: {
 
             }
         }

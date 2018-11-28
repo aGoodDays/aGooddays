@@ -31,7 +31,8 @@
         </activity>
         <activity android:name=".BluetoothConnect" />
         <activity android:name=".BluetoothSPPActivity" />
-        <activity android:name=".MainActivity"></activity>
+        <activity android:name=".MainActivity" />
+        <activity android:name=".ViewActivity"></activity>
     </application>
 
 </manifest>
