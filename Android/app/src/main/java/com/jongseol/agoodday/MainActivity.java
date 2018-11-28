@@ -1,261 +1,295 @@
 package com.jongseol.agoodday;
 
+import android.app.Activity;
+import android.bluetooth.BluetoothAdapter;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.jongseol.agoodday.API.APIClient;
 import com.jongseol.agoodday.API.APIInterface;
+import com.jongseol.agoodday.Adapter.PostureListAdapter;
+import com.jongseol.agoodday.Model.Posture;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.TimeZone;
+
+import app.akexorcist.bluetotohspp.library.BluetoothSPP;
+import app.akexorcist.bluetotohspp.library.BluetoothState;
+import app.akexorcist.bluetotohspp.library.DeviceList;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-/**
- * @file jongseol.agoodday.MainActivity.java
- * @brief Control Device(Raspberry Pi) and Control Data Transmission
- * @author jeje(las9897@gmail.com)
- */
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private static final boolean CONNECT_START = true;
-    private static final boolean CONNECT_PAUSE = false;
-    private static final int LOW_SENSITIVE_LEVEL = 1;
-    private static final int MIDDLE_SENSITIVE_LEVEL = 2;
-    private static final int HIGH_SENSITIVE_LEVEL = 3;
 
-    // Data Variable
+    //Bluetooth
+    private BluetoothSPP bluetoothSPP;
+
+    //Vibrator
+    private Vibrator vibrator;
+
+    private LinearLayout layout_bluetooth, layout_level, layout_controller;
+    private Button btn_connect, btn_level1, btn_level2, btn_level3, btn_on, btn_stop, btn_off, btn_sync, btn_test;
+    private TextView textView_device_id, textView_test;
+    private ListView listView;
+
+    private boolean CONNECT_STATE = false;
+    private int LEVEL = 0;
+
+    public static final TimeZone timezone = TimeZone.getTimeZone("Asia/Seoul");
+    public static final SimpleDateFormat simpledateformat = new SimpleDateFormat("yyyy-MM-dd");
+
     private String device_id;
-    private boolean connect_state;
-    private int sensitive_level;
 
-    // View Variable
-    private Button btn_pause, btn_off, btn_level, btn_sync;
-    private EditText startdate, enddate;
-    private ListView listview;
-    private TextView result;
-
-    // Json Transmission Variable
     private APIInterface apiInterface;
-    private JsonArray jsonArray;
+    private ArrayList<Posture> postureArrayList;
+    private PostureListAdapter postureListAdapter;
 
-    /**
-     * @brief Processing after receiving device_id from ConnectActivity.java. Show
-     *        data to the user.
-     * @param requestCode
-     * @param resultCode
-     * @param data
-     */
+
     @Override
-    protected void onActivityResult(final int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        switch (resultCode) {
-        case 100:
-            device_id = data.getStringExtra("device_id");
-            Call<JsonArray> call = startdate.getText().toString().equals("") || enddate.getText().toString().equals("")
-                    ? apiInterface.getJson(device_id)
-                    : apiInterface.getJson(device_id, startdate.getText().toString(), enddate.getText().toString());
-            call.enqueue(new Callback<JsonArray>() {
-                @Override
-                public void onResponse(Call<JsonArray> call, Response<JsonArray> response) {
-                    if (response.isSuccessful()) {
-                        jsonArray = response.body();
-                        Gson gson = new Gson();
-                        result.setText(gson.toJson(response.body()));
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<JsonArray> call, Throwable t) {
-
-                }
-            });
-            break;
-        default:
-            break;
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        if (requestCode == BluetoothState.REQUEST_CONNECT_DEVICE) {//btn_connect
+            if (resultCode == Activity.RESULT_OK) {
+                bluetoothSPP.connect(data); // 연결 시도
+            }
+        } else if (requestCode == BluetoothState.REQUEST_ENABLE_BT) {
+            if (resultCode == Activity.RESULT_OK) {
+                bluetoothSPP.setupService();
+                bluetoothSPP.startService(BluetoothState.DEVICE_OTHER);
+            } else {
+                Toast.makeText(getApplicationContext(), "Bluetooth was not enabled.", Toast.LENGTH_SHORT);
+            }
         }
     }
 
-    /**
-     * @brief Setting menu option
-     * @param menu
-     * @return boolean
-     */
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.actionbar_connect, menu);
-        return true;
-    }
-
-    /**
-     * @brief Selected Item. Start ConnectActivity.java
-     * @param item
-     * @return boolean
-     */
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-        case R.id.actionbar_connect:
-            Intent intent = new Intent(MainActivity.this, ConnectActivity.class);
-            startActivityForResult(intent, 0);
-            return true;
-        default:
-            return super.onOptionsItemSelected(item);
-        }
-    }
-
-    /**
-     * @brief When the MainActivity.java is created
-     * @param savedInstanceState
-     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Init Data;
-        device_id = "";
-        connect_state = false;
-        sensitive_level = 0;
+        vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+        //TimeZone Setting
+        simpledateformat.setTimeZone(timezone);
 
-        // Init View
-        btn_pause = (Button) findViewById(R.id.main_btn_pause);
+        //VIew Init
+        layout_bluetooth = (LinearLayout) findViewById(R.id.main_layout_bluetooth);
+        layout_level = (LinearLayout) findViewById(R.id.main_layout_level);
+        layout_controller = (LinearLayout) findViewById(R.id.main_layout_controller);
+        btn_connect = (Button) findViewById(R.id.main_btn_connect);
+        btn_level1 = (Button) findViewById(R.id.main_btn_level_1);
+        btn_level2 = (Button) findViewById(R.id.main_btn_level_2);
+        btn_level3 = (Button) findViewById(R.id.main_btn_level_3);
+        btn_on = (Button) findViewById(R.id.main_btn_on);
+        btn_stop = (Button) findViewById(R.id.main_btn_stop);
         btn_off = (Button) findViewById(R.id.main_btn_off);
-        btn_level = (Button) findViewById(R.id.main_btn_level);
         btn_sync = (Button) findViewById(R.id.main_btn_sync);
-        startdate = (EditText) findViewById(R.id.main_edittext_startdate);
-        enddate = (EditText) findViewById(R.id.main_edittext_enddate);
-        listview = (ListView) findViewById(R.id.main_listview);
+        btn_test = (Button) findViewById(R.id.main_btn_test);
+        textView_device_id = (TextView) findViewById(R.id.main_textview_device_id);
+        textView_test = (TextView) findViewById(R.id.main_textview_test);
+        listView = (ListView) findViewById(R.id.main_listview);
 
-        //Init Json Transmission
+        //API Setting
         apiInterface = APIClient.getClient().create(APIInterface.class);
-        result = (TextView) findViewById(R.id.main_textview_result);
 
+        //ListView Setting
+        postureArrayList = new ArrayList<>();
+        postureListAdapter = new PostureListAdapter(postureArrayList);
 
-        /**
-         * @brief Button btn_pause click event listener. 
-         * @see For Test Listener.
-         */
-        btn_pause.setOnClickListener(new View.OnClickListener() {
+        //VISIBLE Setting
+        layout_level.setVisibility(View.GONE);
+        layout_controller.setVisibility(View.GONE);
+        listView.setVisibility(View.GONE);
+
+        //Button Setting
+        btn_connect.setOnClickListener(this);
+        btn_level1.setOnClickListener(this);
+        btn_level2.setOnClickListener(this);
+        btn_level3.setOnClickListener(this);
+        btn_on.setOnClickListener(this);
+        btn_off.setOnClickListener(this);
+        btn_stop.setOnClickListener(this);
+        btn_sync.setOnClickListener(this);
+        btn_test.setOnClickListener(this);
+
+        //Bluetooth Setting
+        bluetoothSPP = new BluetoothSPP(this);
+
+        if (!bluetoothSPP.isBluetoothAvailable()) {
+            Toast.makeText(this, "Bluetooth is not available", Toast.LENGTH_SHORT).show();
+        }
+
+        bluetoothSPP.setOnDataReceivedListener(new BluetoothSPP.OnDataReceivedListener() {
             @Override
-            public void onClick(View v) {
-                if (connect_state) {
-                    connect_state = CONNECT_PAUSE;
-                    btn_pause.setText("START");
-
-                } else {
-                    Call<JsonArray> call = apiInterface.insertJson(jsonArray);
-                    call.enqueue(new Callback<JsonArray>() {
-                        @Override
-                        public void onResponse(Call<JsonArray> call, Response<JsonArray> response) {
-                            if (response.isSuccessful()) {
-                                result.setText("성공!");
-                            }
-                        }
-
-                        @Override
-                        public void onFailure(Call<JsonArray> call, Throwable t) {
-                            result.setText("실패!");
-                        }
-                    });
-                    connect_state = CONNECT_START;
-                    btn_pause.setText("PAUSE");
+            public void onDataReceived(byte[] data, String message) {
+                Toast.makeText(MainActivity.this, message, Toast.LENGTH_SHORT).show();
+               if (message == "bad") {
+                    vibrator.vibrate(1000);
                 }
             }
         });
 
-        /**
-         * @brief Button btn_off click event listener. 
-         * @see Nothing. but I will control disconnect or power off
-         */
-        btn_off.setOnClickListener(new View.OnClickListener() {
+        bluetoothSPP.setBluetoothConnectionListener(new BluetoothSPP.BluetoothConnectionListener() {
             @Override
-            public void onClick(View v) {
-                // Disconnect & Device Off
+            public void onDeviceConnected(String name, String address) { //연결되었을 때
+                Toast.makeText(getApplicationContext(), "Connected " + name + "\n" + address, Toast.LENGTH_SHORT).show();
+                textView_device_id.setText(name);
+                btn_connect.setText("DISCONNECT");
+                CONNECT_STATE = true;
+                layout_level.setVisibility(View.VISIBLE);
+
+            }
+
+            @Override
+            public void onDeviceDisconnected() {
+                Toast.makeText(getApplicationContext(), "Disconnect", Toast.LENGTH_SHORT).show();
+                btn_connect.setText("CONNECT");
+                textView_device_id.setText("");
+                CONNECT_STATE = false;
+                layout_controller.setVisibility(View.GONE);
+                layout_level.setVisibility(View.GONE);
+            }
+
+            @Override
+            public void onDeviceConnectionFailed() {
+                Toast.makeText(getApplicationContext(), "Unable to connect", Toast.LENGTH_SHORT).show();
+                textView_device_id.setText("Fail");
             }
         });
 
-        /**
-         * @brief Button btn_level click event listener.
-         *        Set Level Data
-         */
-        btn_level.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                switch (sensitive_level) {
-                case LOW_SENSITIVE_LEVEL:
-                    btn_level.setText("2");
-                    sensitive_level = MIDDLE_SENSITIVE_LEVEL;
-                    break;
-                case MIDDLE_SENSITIVE_LEVEL:
-                    btn_level.setText("3");
-                    sensitive_level = HIGH_SENSITIVE_LEVEL;
-                    break;
-                case HIGH_SENSITIVE_LEVEL:
-                    btn_level.setText("1");
-                    sensitive_level = LOW_SENSITIVE_LEVEL;
-                    break;
-                default:
-                    btn_level.setText("1");
-                    sensitive_level = LOW_SENSITIVE_LEVEL;
-                    break;
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        bluetoothSPP.stopService();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        if (!bluetoothSPP.isBluetoothEnabled()) {
+            Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivityForResult(intent, BluetoothState.REQUEST_ENABLE_BT);
+        } else {
+            if (!bluetoothSPP.isServiceAvailable()) {
+                bluetoothSPP.setupService();
+                bluetoothSPP.startService(BluetoothState.DEVICE_OTHER);
+            }
+
+        }
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.main_btn_level_1: {
+                LEVEL = 1;
+                bluetoothSPP.send("1", true);
+                layout_level.setVisibility(View.GONE);
+                layout_controller.setVisibility(View.VISIBLE);
+                break;
+            }
+            case R.id.main_btn_level_2: {
+                bluetoothSPP.send("2", true);
+                LEVEL = 2;
+                layout_level.setVisibility(View.GONE);
+                layout_controller.setVisibility(View.VISIBLE);
+                break;
+            }
+            case R.id.main_btn_level_3: {
+                bluetoothSPP.send("3", true);
+                LEVEL = 3;
+                layout_level.setVisibility(View.GONE);
+                layout_controller.setVisibility(View.VISIBLE);
+                break;
+            }
+            case R.id.main_btn_connect: {
+                if (bluetoothSPP.getServiceState() == BluetoothState.STATE_CONNECTED) {
+                    bluetoothSPP.disconnect(); // Bluetooth disconnect
+                    btn_connect.setText("CONNECT");
+                    textView_device_id.setText("");
+                    CONNECT_STATE = false;
+                    layout_controller.setVisibility(View.GONE);
+                    layout_level.setVisibility(View.GONE);
+                } else {// 블루투스 연결 액티비티 이동
+                    Intent intent = new Intent(getApplicationContext(), DeviceList.class);
+                    startActivityForResult(intent, BluetoothState.REQUEST_CONNECT_DEVICE);
                 }
+                break;
             }
-        });
-
-        /**
-         * @brief POST requset to /posture/insert
-         */
-        btn_sync.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Call<JsonArray> get_call = startdate.getText().toString().equals("")
-                        || enddate.getText().toString().equals("") ? apiInterface.getJson(device_id)
-                                : apiInterface.getJson(device_id, startdate.getText().toString(),
-                                        enddate.getText().toString());
-                get_call.enqueue(new Callback<JsonArray>() {
+            case R.id.main_btn_on: {
+                bluetoothSPP.send("1", true);
+                break;
+            }
+            case R.id.main_btn_stop: {
+                bluetoothSPP.send("2", true);
+                break;
+            }
+            case R.id.main_btn_off: {
+                bluetoothSPP.send("0", true);
+                break;
+            }
+            case R.id.main_btn_sync: {
+                postureArrayList.clear();
+                Call<JsonArray> call = apiInterface.getDevice(textView_device_id.getText().toString());
+                call.enqueue(new Callback<JsonArray>() {
                     @Override
                     public void onResponse(Call<JsonArray> call, Response<JsonArray> response) {
                         if (response.isSuccessful()) {
-                            jsonArray = response.body();
-                            Call<JsonArray> post_call = apiInterface.insertJson(jsonArray);
-                            post_call.enqueue(new Callback<JsonArray>() {
-                                @Override
-                                public void onResponse(Call<JsonArray> call, Response<JsonArray> response) {
-                                    if (response.isSuccessful()) {
-                                        Gson gson = new Gson();
-                                        result.setText(gson.toJson(response.body()));
-                                    }
+                            JsonArray jsonArray = response.body();
+                            String today = simpledateformat.format(new Date());
+                            Posture posture = new Posture(device_id, today);
+                            for (JsonElement e : jsonArray) {
+                                if (!today.equals(e.getAsJsonObject().get("date").getAsString())) { // 오늘 날짜가 아니라면
+                                    if (posture.all_count == 0)
+                                        posture.all_count = 1;
+                                    posture.ratio = (float) posture.bad_count / posture.all_count;
+                                    postureArrayList.add(posture); // list에 추가
+                                    posture = new Posture(device_id, e.getAsJsonObject().get("date").getAsString()); // 새로운 객체 생성
+                                    today = e.getAsJsonObject().get("date").getAsString();
                                 }
-
-                                @Override
-                                public void onFailure(Call<JsonArray> call, Throwable t) {
-                                    result.setText("실패");
+                                posture.all_count++;
+                                if (e.getAsJsonObject().get("posture").getAsInt() == 1) {
+                                    posture.bad_count++;
                                 }
-                            });
-
-                            Gson gson = new Gson();
-                            result.setText(gson.toJson(response.body()));
+                            }
+                            if (posture.all_count == 0)
+                                posture.all_count = 1;
+                            posture.ratio = (float) posture.bad_count / posture.all_count;
+                            postureArrayList.add(posture); // 마지막 객체 삽입
+                            listView.setAdapter(postureListAdapter);
                         }
                     }
+
                     @Override
                     public void onFailure(Call<JsonArray> call, Throwable t) {
+                        Toast.makeText(MainActivity.this, "Sync Fail", Toast.LENGTH_SHORT).show();
                     }
                 });
+                listView.setVisibility(View.VISIBLE);
+                break;
             }
-        });
+            case R.id.main_btn_test: {
+                textView_device_id.setText("20181113");
+                layout_level.setVisibility(View.VISIBLE);
 
-        // ListView
-
+            }
+        }
     }
 }

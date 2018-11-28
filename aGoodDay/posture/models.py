@@ -5,7 +5,7 @@ from django.db import models
 @file   aGoodDay.posture.models
 @brief  Data class used to collect or display data 
         The primary key is omitted, but exists as an id.
-        The device model is the data, the posture model is the processed data
+        The Device is the data, the PostureData model is the processed data
 @author jeje(las9897@gmail.com)
 """
 
@@ -24,16 +24,20 @@ class Device(models.Model):
     date = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        ordering = ('date',)
+        ordering = ('-date',)
     
     def __str__(self):
         return self.device_id
 
-class PostureData(models.Model): #collect posture data
-    device = models.ForeignKey(Device, on_delete=models.DO_NOTHING)
-    count = models.IntegerField(default=0)
-    start_date = models.DateTimeField()
-    end_date = models.DateTimeField()
+class Posture(models.Model):
+    device_id = models.CharField(max_length=10)
+    date = models.CharField(max_length=10, unique=True)
+    bad_count = models.IntegerField(default=0)
+    all_count = models.IntegerField(default=0)
+    ratio = models.FloatField(default=0)
 
     class Meta:
-        ordering = ('device',)
+        ordering = ('-date',)
+
+    def __str__(self):
+        return self.device_id

@@ -8,8 +8,13 @@ from rest_framework.urlpatterns import format_suffix_patterns
 @author jeje (las9897@gmail.com)
 """
 urlpatterns = [
-    path('posture/insert/', views.DeviceInsert.as_view()),
-    path('posture/<str:device_id>/',  views.DeviceDetail.as_view()),
+    path('device/insert/', views.DeviceDetail.as_view()),
+    path('device/<str:device_id>/',  views.DeviceDetail.as_view()),
+    path('posture/<str:device_id>/', views.PostureDetail.as_view()),
+    path('posture/<str:device_id>/update/', views.PostureUpdate.as_view()),
+
+
+  
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)
