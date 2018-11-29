@@ -66,12 +66,9 @@ class PostureUpdate(generics.UpdateAPIView):
         device_id = self.kwargs['device_id']
         return Posture.objects.filter(device_id=device_id)
 
-    def put(self, request, *args, **kwargs):
+    def update(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data, many=isinstance(request.data, list))
+        serializer.is_valid(raise_exception)
+        self.perform_update(serializer)
+        headers = self.get_success_headers(serializer.data)
 
-        serializer = PostureSerializer(data=request.data, many=True)
-
-        if serializer.is_valid():
-            serializer.save()
-            return Response(status=status.HTTP_200_OK)
-        else:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
