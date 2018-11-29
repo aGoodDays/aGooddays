@@ -20,7 +20,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.jongseol.agoodday.API.APIClient;
 import com.jongseol.agoodday.API.APIInterface;
-import com.jongseol.agoodday.Adapter.PostureListAdapter;
+import com.jongseol.agoodday.Adapter.PostureAdapter;
 import com.jongseol.agoodday.Model.Posture;
 
 import java.text.SimpleDateFormat;
@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Vibrator vibrator;
 
     private LinearLayout layout_bluetooth, layout_level, layout_controller, layout_mode;
-    private Button btn_connect, btn_level1, btn_level2, btn_level3, btn_on, btn_stop, btn_off, btn_sync, btn_test, btn_server, btn_local, btn_view;
+    private Button btn_connect, btn_level1, btn_level2, btn_level3, btn_on, btn_stop, btn_off, btn_sync, btn_server, btn_local, btn_view;
     private TextView textView_device_id, textView_test;
     private ListView listView;
 
@@ -59,7 +59,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private APIInterface apiInterface;
     private ArrayList<Posture> postureArrayList;
-    private PostureListAdapter postureListAdapter;
+    private PostureAdapter postureAdapter;
 
 
     @Override
@@ -102,7 +102,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         btn_stop = (Button) findViewById(R.id.main_btn_stop);
         btn_off = (Button) findViewById(R.id.main_btn_off);
         btn_sync = (Button) findViewById(R.id.main_btn_sync);
-        btn_test = (Button) findViewById(R.id.main_btn_test);
         btn_view = (Button) findViewById(R.id.main_btn_view);
         textView_device_id = (TextView) findViewById(R.id.main_textview_device_id);
         textView_test = (TextView) findViewById(R.id.main_textview_test);
@@ -113,7 +112,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         //ListView Setting
         postureArrayList = new ArrayList<>();
-        postureListAdapter = new PostureListAdapter(postureArrayList);
+        postureAdapter = new PostureAdapter(postureArrayList);
 
         //VISIBLE Setting
         layout_mode.setVisibility(View.GONE);
@@ -130,7 +129,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         btn_off.setOnClickListener(this);
         btn_stop.setOnClickListener(this);
         btn_sync.setOnClickListener(this);
-        btn_test.setOnClickListener(this);
         btn_server.setOnClickListener(this);
         btn_local.setOnClickListener(this);
         btn_view.setOnClickListener(this);
@@ -145,7 +143,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         bluetoothSPP.setOnDataReceivedListener(new BluetoothSPP.OnDataReceivedListener() {
             @Override
             public void onDataReceived(byte[] data, String message) {
-                if(message.contains("ID")){
+                if (message.contains("ID")) {
                     textView_device_id.setText(message.substring(2));
                 }
                 Log.d("receiver ", message);
@@ -287,7 +285,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             else
                                 posture.ratio = (float) posture.bad_count / posture.all_count;
                             postureArrayList.add(posture); // 마지막 객체 삽입
-                            listView.setAdapter(postureListAdapter);
+                            listView.setAdapter(postureAdapter);
                         }
                     }
 
@@ -297,11 +295,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     }
                 });
                 listView.setVisibility(View.VISIBLE);
-                break;
-            }
-            case R.id.main_btn_test: {
-                textView_device_id.setText("901180076");
-                layout_mode.setVisibility(View.VISIBLE);
                 break;
             }
             case R.id.main_btn_server: {

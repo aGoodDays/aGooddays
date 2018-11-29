@@ -35,11 +35,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="VIEW"/>
-        <Button
-            android:id="@+id/main_btn_test"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="TEST" />
 
     </LinearLayout>
     <LinearLayout

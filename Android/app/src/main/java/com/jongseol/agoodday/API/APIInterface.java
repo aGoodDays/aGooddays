@@ -65,7 +65,6 @@ public interface APIInterface {
     @GET ( "device/{device_id}/all" )
     Call<JsonArray> getPosture(@Path ( "device_id" ) String device_id);
 
-
     @Headers ( {"Accept: application/json", "Content-Type: application/json"} )
     @PATCH ("posture/{device_id}/")
     Call<JsonArray> patchPosture(@Path("device_Id") String device_id, @Body JsonArray jsonArray);
