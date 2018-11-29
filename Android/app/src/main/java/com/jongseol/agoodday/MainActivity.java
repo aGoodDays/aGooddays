@@ -18,6 +18,7 @@ import android.widget.Toast;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.jongseol.agoodday.API.APIClient;
 import com.jongseol.agoodday.API.APIInterface;
 import com.jongseol.agoodday.Adapter.PostureAdapter;
@@ -45,7 +46,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Vibrator vibrator;
 
     private LinearLayout layout_bluetooth, layout_level, layout_controller, layout_mode;
-    private Button btn_connect, btn_level1, btn_level2, btn_level3, btn_on, btn_stop, btn_off, btn_sync, btn_server, btn_local, btn_view;
+    private Button btn_connect, btn_level1, btn_level2, btn_level3, btn_on, btn_stop, btn_off, btn_sync, btn_server, btn_local, btn_view, btn_test;
     private TextView textView_device_id, textView_test;
     private ListView listView;
 
@@ -103,6 +104,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         btn_off = (Button) findViewById(R.id.main_btn_off);
         btn_sync = (Button) findViewById(R.id.main_btn_sync);
         btn_view = (Button) findViewById(R.id.main_btn_view);
+        btn_test = (Button) findViewById(R.id.main_btn_test);
         textView_device_id = (TextView) findViewById(R.id.main_textview_device_id);
         textView_test = (TextView) findViewById(R.id.main_textview_test);
         listView = (ListView) findViewById(R.id.main_listview);
@@ -286,6 +288,36 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 posture.ratio = (float) posture.bad_count / posture.all_count;
                             postureArrayList.add(posture); // 마지막 객체 삽입
                             listView.setAdapter(postureAdapter);
+
+
+                            today = simpledateformat.format(new Date());
+                            //update or create
+                            for (Posture p : postureArrayList) {
+                                if (p.date.equals(today)) {
+                                    Call<JsonObject> call2 = apiInterface.updatePosture(p.device_id, p.date, p.bad_count, p.all_count, p.ratio);
+                                    call2.enqueue(new Callback<JsonObject>() {
+                                        @Override
+                                        public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                                            if(response.isSuccessful()){
+                                                Log.d("TEST UPDATE", "Success");
+                                            }
+                                            else{
+                                                Log.d("TEST UPDATE", "Success .. but Fail");
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onFailure(Call<JsonObject> call, Throwable t) {
+                                            Log.d("TEST UPDATE", "Fail");
+                                        }
+                                    });
+
+
+                                }
+
+                            }
+
+
                         }
                     }
 
@@ -310,8 +342,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             }
             case R.id.main_btn_view: {
-
+                break;
             }
+            case R.id.main_btn_test: {
+                textView_device_id.setText("1001180101");
+                layout_level.setVisibility(View.VISIBLE);
+                break;
+            }
+
         }
     }
 }

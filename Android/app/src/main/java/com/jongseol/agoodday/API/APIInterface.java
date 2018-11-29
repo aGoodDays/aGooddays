@@ -66,41 +66,13 @@ public interface APIInterface {
     Call<JsonArray> getPosture(@Path ( "device_id" ) String device_id);
 
     @Headers ( {"Accept: application/json", "Content-Type: application/json"} )
-    @PATCH ("posture/{device_id}/")
+    @PATCH ("posture/{device_id}/update")
     Call<JsonArray> patchPosture(@Path("device_Id") String device_id, @Body JsonArray jsonArray);
 
-    /**
-     * @param jsonArray : json type data in list [{"device_id": string, "posture": int, ...}, {"device_id":string ...}, ... ]
-     * @return Call<JsonArray>
-     * @brief Request Method POST: posture/insert/
-     * Insert into posture_device(device_id, posture, saX, saY, saZ, sgX, sgY, sgZ, xdegree, ydegree, zdegree) value(device_id, posture, saX, saY, saZ, sgX, sgY, sgZ, xdegree, ydegree, zdegree)
-     */
-    @Headers ( {"Accept: application/json", "Content-Type: application/json"} )
-    @POST ( "device/insert/" )
-    Call<JsonArray> insertDevice(@Body JsonArray jsonArray);
 
-    /**
-     * @param device_id
-     * @param postrue
-     * @param saX
-     * @param saY
-     * @param saZ
-     * @param sgX
-     * @param sgY
-     * @param sgZ
-     * @param xdegree
-     * @param ydegree
-     * @param zdegree
-     * @return Call<Device>
-     * @brief Same as above
-     */
     @FormUrlEncoded
-    @POST ( "device/insert/" )
-    Call<Device> insertDevice(@Field ( "device_id" ) String device_id, @Field ( "posture" ) int postrue,
-                              @Field ( "saX" ) float saX, @Field ( "saY" ) float saY, @Field ( "saZ" ) float saZ,
-                              @Field ( "sgX" ) float sgX, @Field ( "sgY" ) float sgY, @Field ( "sgZ" ) float sgZ,
-                              @Field ( "xdegree" ) float xdegree, @Field ( "ydegree" ) float ydegree,
-                              @Field ( "zdegree" ) float zdegree);
+    @PUT("posture/{device_Id}/update")
+    Call<JsonObject> updatePosture(@Field("device_id") String device_id, @Field("date") String date, @Field("bad_count") int bad_couont,@Field("all_count") int all_count, @Field("ratio") float ratio);
 
 
 }

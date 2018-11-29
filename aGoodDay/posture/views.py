@@ -60,15 +60,8 @@ class PostureDetail(generics.ListCreateAPIView):
 class PostureUpdate(generics.UpdateAPIView):
     queryset = Posture.objects.all()
     serializer_class = PostureSerializer
-    lookup_field = 'device_id'
+    lookup_field = 'date'
 
     def get_queryset(self):
         device_id = self.kwargs['device_id']
         return Posture.objects.filter(device_id=device_id)
-
-    def update(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data, many=isinstance(request.data, list))
-        serializer.is_valid(raise_exception=True)
-        self.perform_update(serializer)
-        headers = self.get_success_headers(serializer.data)
-
