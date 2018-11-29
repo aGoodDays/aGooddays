@@ -9,9 +9,9 @@ from rest_framework.urlpatterns import format_suffix_patterns
 """
 urlpatterns = [
     path('device/insert/', views.DeviceDetail.as_view()),
-    path('device/<str:device_id>/',  views.DeviceDetail.as_view()),
-    path('posture/<str:device_id>/', views.PostureDetail.as_view()),
-    path('posture/<str:device_id>/update/', views.PostureUpdate.as_view()),
+    path('device/<int:device_id>/',  views.DeviceDetail.as_view()),
+    path('posture/<int:device_id>/', views.PostureDetail.as_view()),
+    path('posture/<int:device_id>/update/', views.PostureUpdate.as_view()),
 
 
   
