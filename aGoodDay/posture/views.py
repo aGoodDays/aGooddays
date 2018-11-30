@@ -4,7 +4,7 @@ from posture.serializers import DeviceSerializer, PostureSerializer
 from rest_framework import  generics, status
 from rest_framework.response import Response
 
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
 
 
 
@@ -15,32 +15,32 @@ from datetime import date, timedelta
 @param  int device_id | string start_date | string end_date
 @return array
 """
-class DeviceDetail(generics.ListCreateAPIView):
+class DeviceDetail(generics.ListAPIView):
     serializer_class = DeviceSerializer
 
     def get_queryset(self):
-        add_day = self.request.GET['date']
-        if add_day:
-            print("date "+add_day+ "exist")
-        else:
-            print("date not exist")
-
-        
-        start_date = self.request.GET['start_date']
-        end_date = self.request.GET['end_date']
-        if start_date:
-            print(start_date)
-        else:
-            print("start not exist")
-        if end_date:
-            print(end_date)
-        else:
-            print("end not exist")
+        add_day = None
+        start_date = None
+        end_date = None
+        if 'date' in self.request.GET:
+            add_day = self.request.GET['date']
+  
+        if 'start_date' in self.request.GET and 'end_date' in self.request.GET:
+            start_date = self.request.GET['start_date']
+            end_date = self.request.GET['end_date']
+    
         device_id = self.kwargs['device_id']
         #today = self.request.GET.get('today')
-        today = date.today() + timedelta(days=add_day)
-        pre_day = today - timedelta(days=add_day)
-        return Device.objects.filter(device_id=device_id, date__range=[pre_day, today])
+        today = date.today() + timedelta(days=1)
+        
+        if add_day is not None:
+            pre_day = today - timedelta(days=int(add_day))
+            query = Device.objects.filter(device_id=device_id, date__range=[pre_day, today])
+        elif start_date is not None and end_date is not None:
+            start_date = datetime.strptime(start_date, '%Y-%m-%d').date()
+            end_date = datetime.strptime(end_date, '%Y-%m-%d').date()
+            query = Device.objects.filter(device_id=device_id, date__range=[start_date, end_date])
+        return query
         
     # def create(self, request, *args, **kwargs):
     #     serializer = self.get_serializer(data=request.data, many=isinstance(request.data,list))

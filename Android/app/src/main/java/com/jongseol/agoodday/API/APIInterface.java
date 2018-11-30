@@ -27,10 +27,10 @@ import retrofit2.http.Query;
 public interface APIInterface {
 
     @GET ( "device/{device_id}/" )
-    Call<JsonArray> getDevice(@Path ( "device_id" ) String device_id, @Field("date") int date);
+    Call<JsonArray> getDevice(@Path ( "device_id" ) String device_id, @Query("date") int date);
 
     @GET ( "device/{device_id}/" )
-    Call<JsonArray> getDevice(@Path ( "device_id" ) String device_id, @Field("start_date") String start_date, @Field("end_date") String end_date);
+    Call<JsonArray> getDevice(@Path ( "device_id" ) String device_id, @Query("start_date") String start_date, @Query("end_date") String end_date);
 
 
 }

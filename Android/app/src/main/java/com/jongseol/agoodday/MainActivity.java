@@ -134,6 +134,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         btn_server.setOnClickListener(this);
         btn_local.setOnClickListener(this);
         btn_view.setOnClickListener(this);
+        btn_test.setOnClickListener(this);
 
         //Bluetooth Setting
         bluetoothSPP = new BluetoothSPP(this);
@@ -322,7 +323,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             }
             case R.id.main_btn_test: {
-                textView_device_id.setText("20181113");
+                textView_device_id.setText("1001180101");
                 layout_level.setVisibility(View.VISIBLE);
                 break;
             }
