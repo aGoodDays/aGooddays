@@ -27,7 +27,7 @@ class Device(models.Model):
         ordering = ('-date',)
     
     def __str__(self):
-        return self.device_id
+        return str(self.device_id)
 
 class Posture(models.Model):
     device_id = models.CharField(max_length=10)

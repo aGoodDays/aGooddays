@@ -3,7 +3,6 @@
 # Custom
 myvenv/
 .vscode/
-Android/
 
 # Created by https://www.gitignore.io/api/c,java,python,django,android,database,androidstudio
 # Edit at https://www.gitignore.io/?templates=c,java,python,django,android,database,androidstudio
