@@ -31,7 +31,7 @@ class Device(models.Model):
 
 class Posture(models.Model):
     device_id = models.CharField(max_length=10)
-    date = models.CharField(max_length=10, unique=True)
+    date = models.CharField(max_length=10)
     bad_count = models.IntegerField(default=0)
     all_count = models.IntegerField(default=0)
     ratio = models.FloatField(default=0)

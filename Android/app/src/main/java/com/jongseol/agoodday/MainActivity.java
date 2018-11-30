@@ -206,6 +206,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
@@ -221,6 +222,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 LEVEL = 2;
                 layout_level.setVisibility(View.GONE);
                 layout_controller.setVisibility(View.VISIBLE);
+
                 break;
             }
             case R.id.main_btn_level_3: {
@@ -259,7 +261,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
             case R.id.main_btn_sync: {
                 postureArrayList.clear();
-                Call<JsonArray> call = apiInterface.getDevice(textView_device_id.getText().toString());
+                Call<JsonArray> call = apiInterface.getDevice(textView_device_id.getText().toString(), 0);
                 call.enqueue(new Callback<JsonArray>() {
                     @Override
                     public void onResponse(Call<JsonArray> call, Response<JsonArray> response) {
@@ -290,34 +292,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             listView.setAdapter(postureAdapter);
 
 
-                            today = simpledateformat.format(new Date());
-                            //update or create
-                            for (Posture p : postureArrayList) {
-                                if (p.date.equals(today)) {
-                                    Call<JsonObject> call2 = apiInterface.updatePosture(p.device_id, p.date, p.bad_count, p.all_count, p.ratio);
-                                    call2.enqueue(new Callback<JsonObject>() {
-                                        @Override
-                                        public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-                                            if(response.isSuccessful()){
-                                                Log.d("TEST UPDATE", "Success");
-                                            }
-                                            else{
-                                                Log.d("TEST UPDATE", "Success .. but Fail");
-                                            }
-                                        }
-
-                                        @Override
-                                        public void onFailure(Call<JsonObject> call, Throwable t) {
-                                            Log.d("TEST UPDATE", "Fail");
-                                        }
-                                    });
-
-
-                                }
-
-                            }
-
-
                         }
                     }
 
@@ -342,10 +316,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             }
             case R.id.main_btn_view: {
+                Intent intent = new Intent(this, ViewActivity.class);
+                intent.putExtra("device_id", textView_device_id.getText().toString());
+                startActivity(intent);
                 break;
             }
             case R.id.main_btn_test: {
-                textView_device_id.setText("1001180101");
+                textView_device_id.setText("20181113");
                 layout_level.setVisibility(View.VISIBLE);
                 break;
             }

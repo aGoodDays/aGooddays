@@ -18,4 +18,4 @@ class DeviceSerializer(serializers.ModelSerializer):
 class PostureSerializer(serializers.ModelSerializer):
     class Meta:
         model = Posture
-        fields = '__all__'#('device_id', 'bad_count', 'all_count', 'ratio')
+        fields = ('bad_count', 'all_count', 'ratio')

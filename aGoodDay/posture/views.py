@@ -1,8 +1,9 @@
 from rest_framework import status
 from posture.models import Device, Posture
 from posture.serializers import DeviceSerializer, PostureSerializer
-from rest_framework import  generics, status, viewsets
+from rest_framework import  generics, status
 from rest_framework.response import Response
+
 from datetime import date, timedelta
 
 
@@ -18,10 +19,27 @@ class DeviceDetail(generics.ListCreateAPIView):
     serializer_class = DeviceSerializer
 
     def get_queryset(self):
+        add_day = self.request.GET['date']
+        if add_day:
+            print("date "+add_day+ "exist")
+        else:
+            print("date not exist")
+
+        
+        start_date = self.request.GET['start_date']
+        end_date = self.request.GET['end_date']
+        if start_date:
+            print(start_date)
+        else:
+            print("start not exist")
+        if end_date:
+            print(end_date)
+        else:
+            print("end not exist")
         device_id = self.kwargs['device_id']
         #today = self.request.GET.get('today')
-        today = date.today() + timedelta(days=1)
-        pre_day = today - timedelta(days=7)
+        today = date.today() + timedelta(days=add_day)
+        pre_day = today - timedelta(days=add_day)
         return Device.objects.filter(device_id=device_id, date__range=[pre_day, today])
         
     # def create(self, request, *args, **kwargs):
@@ -57,11 +75,14 @@ class PostureDetail(generics.ListCreateAPIView):
         device_id = self.kwargs['device_id']
         return Posture.objects.filter(device_id=device_id)
 
-class PostureUpdate(generics.UpdateAPIView):
+    
+
+class PostureUpdate(generics.RetrieveUpdateAPIView):
     queryset = Posture.objects.all()
     serializer_class = PostureSerializer
-    lookup_field = 'date'
+    lookup_field = 'device_id'
 
     def get_queryset(self):
         device_id = self.kwargs['device_id']
-        return Posture.objects.filter(device_id=device_id)
+        date = self.request.GET['date']
+        return Posture.objects.filter(device_id=device_id, date=date)

@@ -1,15 +1,6 @@
 package com.jongseol.agoodday.API;
 
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonArray;
-
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Locale;
-import java.util.TimeZone;
-
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
@@ -27,7 +18,6 @@ public class APIClient {
     /**
      * @brief get Client and Retrofit setting
      * @return Retrofit
-     * @see need to change for url
      */
     public static Retrofit getClient() {
         HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
@@ -35,6 +25,7 @@ public class APIClient {
         OkHttpClient client = new OkHttpClient.Builder().addInterceptor(interceptor).build();
         retrofit = new Retrofit.Builder()
                 .baseUrl("http://220.149.242.12:51222")
+                //.baseUrl("http://localhost:8000")
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(client)
                 .build();
