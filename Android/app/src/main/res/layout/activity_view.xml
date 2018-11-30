@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:orientation="vertical"
+    tools:context=".ViewActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+
+        <LinearLayout
+            android:layout_gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:gravity="center">
+
+            <com.github.pinball83.maskededittext.MaskedEditText
+                android:id="@+id/view_mask_start_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:inputType="number"
+                app:mask="****-**-**"
+                app:notMaskedSymbol="*"
+                android:hint="yyyymmdd"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=" ~ "/>
+
+            <com.github.pinball83.maskededittext.MaskedEditText
+                android:id="@+id/view_mask_end_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:inputType="number"
+                app:mask="****-**-**"
+                app:notMaskedSymbol="*" />
+
+
+
+            <Button
+                android:id="@+id/view_btn_search"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="search" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center">
+
+            <Button
+                android:id="@+id/view_btn_week"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="week" />
+
+            <Button
+                android:id="@+id/view_btn_2week"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="2 week" />
+
+            <Button
+                android:id="@+id/view_btn_4week"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="4week" />
+
+
+        </LinearLayout>
+
+        <com.github.mikephil.charting.charts.LineChart
+            android:id="@+id/view_linechart"
+            android:layout_width="match_parent"
+            android:layout_height="250dp" />
+
+        <ListView
+            android:id="@+id/view_listview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+</ScrollView>

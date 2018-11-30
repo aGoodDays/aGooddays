@@ -262,7 +262,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
             case R.id.main_btn_sync: {
                 postureArrayList.clear();
-                Call<JsonArray> call = apiInterface.getDevice(textView_device_id.getText().toString(), 0);
+                Call<JsonArray> call = apiInterface.getDevice(textView_device_id.getText().toString(), 7);
                 call.enqueue(new Callback<JsonArray>() {
                     @Override
                     public void onResponse(Call<JsonArray> call, Response<JsonArray> response) {
@@ -294,11 +294,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
                         }
+                        else{
+                            postureArrayList.clear();
+                            postureAdapter.notifyDataSetChanged();
+                        }
                     }
 
                     @Override
                     public void onFailure(Call<JsonArray> call, Throwable t) {
                         Toast.makeText(MainActivity.this, "Sync Fail", Toast.LENGTH_SHORT).show();
+                        postureArrayList.clear();
+                        postureAdapter.notifyDataSetChanged();
                     }
                 });
                 listView.setVisibility(View.VISIBLE);
