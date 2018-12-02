@@ -15,23 +15,24 @@
 
 
         <LinearLayout
-            android:layout_gravity="center"
             android:layout_width="wrap_content"
             android:layout_height="50dp"
+            android:layout_gravity="center"
             android:gravity="center">
 
             <com.github.pinball83.maskededittext.MaskedEditText
                 android:id="@+id/view_mask_start_date"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:hint="yyyymmdd"
                 android:inputType="number"
                 app:mask="****-**-**"
-                app:notMaskedSymbol="*"
-                android:hint="yyyymmdd"/>
+                app:notMaskedSymbol="*" />
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text=" ~ "/>
+                android:text=" ~ " />
 
             <com.github.pinball83.maskededittext.MaskedEditText
                 android:id="@+id/view_mask_end_date"
@@ -40,7 +41,6 @@
                 android:inputType="number"
                 app:mask="****-**-**"
                 app:notMaskedSymbol="*" />
-
 
 
             <Button

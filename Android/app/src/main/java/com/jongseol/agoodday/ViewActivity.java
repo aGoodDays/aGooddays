@@ -5,22 +5,14 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
-import android.widget.ScrollView;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import com.github.mikephil.charting.animation.Easing;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.components.Description;
@@ -38,11 +30,9 @@ import com.jongseol.agoodday.Adapter.PostureAdapter;
 import com.jongseol.agoodday.Model.Marker;
 import com.jongseol.agoodday.Model.Posture;
 
-import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.TimeZone;
 
 import retrofit2.Call;
@@ -58,6 +48,7 @@ public class ViewActivity extends AppCompatActivity implements View.OnClickListe
 
     public static final TimeZone timezone = TimeZone.getTimeZone("Asia/Seoul");
     public static final SimpleDateFormat simpledateformat = new SimpleDateFormat("yyyy-MM-dd");
+
     private APIInterface apiInterface;
     private ArrayList<Posture> postureArrayList;
     private PostureAdapter postureAdapter;
@@ -144,6 +135,7 @@ public class ViewActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onFailure(Call<JsonArray> call, Throwable t) {
                 Log.d("getData", "Fail");
+                Toast.makeText(ViewActivity.this, "올바른 값을 입력해주세요", Toast.LENGTH_SHORT).show();
                 postureArrayList.clear();
                 lineChart.clear();
                 postureAdapter.notifyDataSetChanged();
@@ -169,7 +161,7 @@ public class ViewActivity extends AppCompatActivity implements View.OnClickListe
                                 posture.ratio = 0;
                             else
                                 posture.ratio = (float) posture.bad_count / posture.all_count;
-                            postureArrayList.add(posture); // list에 추가
+                            postureArrayList.add(posture);
                             posture = new Posture(device_id, e.getAsJsonObject().get("date").getAsString()); // 새로운 객체 생성
                             today = e.getAsJsonObject().get("date").getAsString();
                         }
@@ -200,6 +192,7 @@ public class ViewActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onFailure(Call<JsonArray> call, Throwable t) {
                 Log.d("getData", "Fail");
+                Toast.makeText(ViewActivity.this, "올바른 값을 입력해주세요", Toast.LENGTH_SHORT).show();
                 postureArrayList.clear();
                 lineChart.clear();
                 postureAdapter.notifyDataSetChanged();
@@ -280,47 +273,50 @@ public class ViewActivity extends AppCompatActivity implements View.OnClickListe
         switch (v.getId()) {
             case R.id.view_btn_week: {
                 getData(7);
-                buttonDeley(R.id.view_btn_week);
+                Delay(R.id.view_btn_week);
                 break;
             }
             case R.id.view_btn_2week: {
                 getData(14);
-                buttonDeley(R.id.view_btn_2week);
+                Delay(R.id.view_btn_2week);
                 break;
             }
             case R.id.view_btn_4week: {
                 getData(28);
-                buttonDeley(R.id.view_btn_4week);
+                Delay(R.id.view_btn_4week);
                 break;
             }
             case R.id.view_btn_search: {
-                getData(mask_start_date.getText().toString(), mask_end_date.getText().toString());
-                buttonDeley(R.id.view_btn_search);
+                if(mask_start_date.getText().toString().contains(" ") || mask_end_date.getText().toString().contains(" ")) {
+                    Toast.makeText(this, "올바른 형식으로 입력해주세요. 예) YYYY-MM-DD", Toast.LENGTH_SHORT).show();
+                } else {
+                    getData(mask_start_date.getText().toString(), mask_end_date.getText().toString());
+                    Delay(R.id.view_btn_search);
+                }
                 break;
             }
 
         }
     }
 
-    private class SplashHandler implements Runnable {
+    private class PostureHandler implements Runnable {
+        Button button;
 
-        Button btn;
-
-        public SplashHandler(int btn_id) {
-            this.btn = (Button) findViewById(btn_id);
+        public PostureHandler(int btn_id) {
+            this.button = (Button) findViewById(btn_id);
         }
 
         @Override
         public void run() {
-            btn.setEnabled(true);
+            button.setEnabled(true);
         }
     }
 
-    public void buttonDeley(int btn_id) {
+    public void Delay(int btn_id) {
         Button btn = (Button) findViewById(btn_id);
         btn.setEnabled(false);
         Handler handler = new Handler();
-        handler.postDelayed(new SplashHandler(btn_id), 5000);
+        handler.postDelayed(new PostureHandler(btn_id), 5000);
     }
 }
 
