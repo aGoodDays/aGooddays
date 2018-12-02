@@ -117,10 +117,10 @@
             android:text="OFF" />
 
         <Button
-            android:id="@+id/main_btn_sync"
+            android:id="@+id/main_btn_refresh"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="SYNC" />
+            android:text="refresh" />
     </LinearLayout>
 
     <TextView

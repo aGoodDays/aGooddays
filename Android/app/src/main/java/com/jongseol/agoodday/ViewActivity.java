@@ -45,11 +45,13 @@ import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 
+import app.akexorcist.bluetotohspp.library.BluetoothSPP;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 public class ViewActivity extends AppCompatActivity implements View.OnClickListener {
+
 
     private Button btn_week, btn_2week, btn_4week, btn_search;
     private MaskedEditText mask_start_date, mask_end_date;
@@ -93,12 +95,22 @@ public class ViewActivity extends AppCompatActivity implements View.OnClickListe
         btn_week.performClick();
 
 
+        MainActivity.myActivity.bluetoothSPP.setOnDataReceivedListener(new BluetoothSPP.OnDataReceivedListener() {
+            @Override
+            public void onDataReceived(byte[] data, String message) {
+
+                Log.d("receiver ", message);
+                MainActivity.myActivity.vibrator.vibrate(100);
+
+            }
+        });
+
     }
 
 
     public void getData(int date) {
         postureArrayList.clear();
-        Call<JsonArray> call = apiInterface.getDevice(device_id, date);
+        Call<JsonArray> call = apiInterface.getPostureData(device_id, date);
         call.enqueue(new Callback<JsonArray>() {
             @Override
             public void onResponse(Call<JsonArray> call, Response<JsonArray> response) {
@@ -154,7 +166,7 @@ public class ViewActivity extends AppCompatActivity implements View.OnClickListe
 
     public void getData(String start_date, String end_date) {
         postureArrayList.clear();
-        Call<JsonArray> call = apiInterface.getDevice(device_id, start_date, end_date);
+        Call<JsonArray> call = apiInterface.getPostureData(device_id, start_date, end_date);
         call.enqueue(new Callback<JsonArray>() {
             @Override
             public void onResponse(Call<JsonArray> call, Response<JsonArray> response) {
@@ -280,48 +292,50 @@ public class ViewActivity extends AppCompatActivity implements View.OnClickListe
         switch (v.getId()) {
             case R.id.view_btn_week: {
                 getData(7);
-                buttonDeley(R.id.view_btn_week);
+                Delay(R.id.view_btn_week);
                 break;
             }
             case R.id.view_btn_2week: {
                 getData(14);
-                buttonDeley(R.id.view_btn_2week);
+                Delay(R.id.view_btn_2week);
                 break;
             }
             case R.id.view_btn_4week: {
                 getData(28);
-                buttonDeley(R.id.view_btn_4week);
+                Delay(R.id.view_btn_4week);
                 break;
             }
             case R.id.view_btn_search: {
-                getData(mask_start_date.getText().toString(), mask_end_date.getText().toString());
-                buttonDeley(R.id.view_btn_search);
+                if (mask_start_date.getText().toString().contains(" ") || mask_end_date.getText().toString().contains(" ")) {
+                    Toast.makeText(this, "올바른 형식으로 입력해주세요. \n예) YYYY-MM-DD", Toast.LENGTH_SHORT).show();
+                } else {
+                    getData(mask_start_date.getText().toString(), mask_end_date.getText().toString());
+                    Delay(R.id.view_btn_search);
+                }
                 break;
             }
 
         }
     }
 
-    private class SplashHandler implements Runnable {
+    public void Delay(int btn_id) {
+        Button btn = (Button) findViewById(btn_id);
+        btn.setEnabled(false);
+        Handler handler = new Handler();
+        handler.postDelayed(new PostureHandler(btn_id), 5000);
+    }
 
-        Button btn;
+    private class PostureHandler implements Runnable {
+        Button button;
 
-        public SplashHandler(int btn_id) {
-            this.btn = (Button) findViewById(btn_id);
+        public PostureHandler(int btn_id) {
+            this.button = (Button) findViewById(btn_id);
         }
 
         @Override
         public void run() {
-            btn.setEnabled(true);
+            button.setEnabled(true);
         }
     }
-
-    public void buttonDeley(int btn_id) {
-        Button btn = (Button) findViewById(btn_id);
-        btn.setEnabled(false);
-        Handler handler = new Handler();
-        handler.postDelayed(new SplashHandler(btn_id), 5000);
-    }
 }
-
 

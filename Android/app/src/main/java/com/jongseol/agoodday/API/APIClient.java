@@ -8,24 +8,19 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
  * @file jongseol.agoodday.API.APIClient.java
- * @brief Using open source Retrofit, OkHttpClient and Setting
+ * @brief Retrofit 모듈을 사용하기 위한 설정값들입니다. 클라이언트로 OkHttpClient를, Convert는 GsonCovertFactory를 사용했습니다.
  * @author jeje(las9897@gmail.com)
  */
 public class APIClient {
 
     private static Retrofit retrofit = null;
 
-    /**
-     * @brief get Client and Retrofit setting
-     * @return Retrofit
-     */
     public static Retrofit getClient() {
         HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
         interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
         OkHttpClient client = new OkHttpClient.Builder().addInterceptor(interceptor).build();
         retrofit = new Retrofit.Builder()
                 .baseUrl("http://220.149.242.12:51222")
-                //.baseUrl("http://localhost:8000")
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(client)
                 .build();

@@ -18,7 +18,6 @@ import android.widget.Toast;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import com.jongseol.agoodday.API.APIClient;
 import com.jongseol.agoodday.API.APIInterface;
 import com.jongseol.agoodday.Adapter.PostureAdapter;
@@ -39,18 +38,19 @@ import retrofit2.Response;
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
 
+    public static MainActivity myActivity;
+
     //Bluetooth
-    private BluetoothSPP bluetoothSPP;
+    public BluetoothSPP bluetoothSPP;
 
     //Vibrator
-    private Vibrator vibrator;
+    public static Vibrator vibrator;
 
     private LinearLayout layout_bluetooth, layout_level, layout_controller, layout_mode;
-    private Button btn_connect, btn_level1, btn_level2, btn_level3, btn_on, btn_stop, btn_off, btn_sync, btn_server, btn_local, btn_view, btn_test;
-    private TextView textView_device_id, textView_test;
+    private Button btn_connect, btn_level1, btn_level2, btn_level3, btn_on, btn_stop, btn_off, btn_refresh, btn_server, btn_local, btn_view, btn_test;
+    private TextView textView_device_id;
     private ListView listView;
 
-    private boolean CONNECT_STATE = false;
     private int LEVEL = 0;
 
     public static final TimeZone timezone = TimeZone.getTimeZone("Asia/Seoul");
@@ -83,6 +83,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        myActivity = this;
 
         vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
         //TimeZone Setting
@@ -102,11 +103,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         btn_on = (Button) findViewById(R.id.main_btn_on);
         btn_stop = (Button) findViewById(R.id.main_btn_stop);
         btn_off = (Button) findViewById(R.id.main_btn_off);
-        btn_sync = (Button) findViewById(R.id.main_btn_sync);
+        btn_refresh = (Button) findViewById(R.id.main_btn_refresh);
         btn_view = (Button) findViewById(R.id.main_btn_view);
         btn_test = (Button) findViewById(R.id.main_btn_test);
         textView_device_id = (TextView) findViewById(R.id.main_textview_device_id);
-        textView_test = (TextView) findViewById(R.id.main_textview_test);
         listView = (ListView) findViewById(R.id.main_listview);
 
         //API Setting
@@ -130,7 +130,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         btn_on.setOnClickListener(this);
         btn_off.setOnClickListener(this);
         btn_stop.setOnClickListener(this);
-        btn_sync.setOnClickListener(this);
+        btn_refresh.setOnClickListener(this);
         btn_server.setOnClickListener(this);
         btn_local.setOnClickListener(this);
         btn_view.setOnClickListener(this);
@@ -148,6 +148,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             public void onDataReceived(byte[] data, String message) {
                 if (message.contains("ID")) {
                     textView_device_id.setText(message.substring(2));
+                    device_id = textView_device_id.getText().toString();
                 }
                 Log.d("receiver ", message);
                 vibrator.vibrate(100);
@@ -159,7 +160,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onDeviceConnected(String name, String address) { //연결되었을 때
                 btn_connect.setText("DISCONNECT");
-                CONNECT_STATE = true;
                 btn_view.setVisibility(View.VISIBLE);
                 layout_mode.setVisibility(View.VISIBLE);
 
@@ -170,16 +170,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 Toast.makeText(getApplicationContext(), "Disconnect", Toast.LENGTH_SHORT).show();
                 btn_connect.setText("CONNECT");
                 textView_device_id.setText("");
-                CONNECT_STATE = false;
+                device_id = null;
                 layout_mode.setVisibility(View.GONE);
                 layout_controller.setVisibility(View.GONE);
                 layout_level.setVisibility(View.GONE);
+
             }
 
             @Override
             public void onDeviceConnectionFailed() {
                 Toast.makeText(getApplicationContext(), "Unable to connect", Toast.LENGTH_SHORT).show();
                 textView_device_id.setText("Fail");
+                device_id = null;
             }
         });
 
@@ -189,6 +191,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onDestroy() {
         super.onDestroy();
         bluetoothSPP.stopService();
+        device_id = null;
     }
 
     @Override
@@ -238,10 +241,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     bluetoothSPP.disconnect(); // Bluetooth disconnect
                     btn_connect.setText("CONNECT");
                     textView_device_id.setText("");
-                    CONNECT_STATE = false;
                     layout_mode.setVisibility(View.GONE);
                     layout_controller.setVisibility(View.GONE);
                     layout_level.setVisibility(View.GONE);
+                    device_id = null;
                 } else {// 블루투스 연결 액티비티 이동
                     Intent intent = new Intent(getApplicationContext(), DeviceList.class);
                     startActivityForResult(intent, BluetoothState.REQUEST_CONNECT_DEVICE);
@@ -260,13 +263,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 bluetoothSPP.send("0", true);
                 break;
             }
-            case R.id.main_btn_sync: {
+            case R.id.main_btn_refresh: {
                 postureArrayList.clear();
-                Call<JsonArray> call = apiInterface.getDevice(textView_device_id.getText().toString(), 7);
+                Call<JsonArray> call = apiInterface.getPostureData(textView_device_id.getText().toString(), 7);
                 call.enqueue(new Callback<JsonArray>() {
                     @Override
                     public void onResponse(Call<JsonArray> call, Response<JsonArray> response) {
                         if (response.isSuccessful()) {
+                            Log.d("getData", "Success");
                             JsonArray jsonArray = response.body();
                             String today = simpledateformat.format(new Date());
                             Posture posture = new Posture(device_id, today);
@@ -290,11 +294,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             else
                                 posture.ratio = (float) posture.bad_count / posture.all_count;
                             postureArrayList.add(posture); // 마지막 객체 삽입
+
+                            if (postureArrayList.get(0).all_count == 0)
+                                postureArrayList.remove(0);
                             listView.setAdapter(postureAdapter);
 
 
-                        }
-                        else{
+                        } else {
                             postureArrayList.clear();
                             postureAdapter.notifyDataSetChanged();
                         }
@@ -323,6 +329,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             }
             case R.id.main_btn_view: {
+                if (device_id == null || device_id.equals("") || !isNumeric(device_id)) {
+                    Toast.makeText(myActivity, "기기와 연결해주세요.", Toast.LENGTH_SHORT).show();
+                    break;
+                }
                 Intent intent = new Intent(this, ViewActivity.class);
                 intent.putExtra("device_id", textView_device_id.getText().toString());
                 startActivity(intent);
@@ -330,10 +340,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
             case R.id.main_btn_test: {
                 textView_device_id.setText("1001180101");
+                device_id = "1001180101";
                 layout_level.setVisibility(View.VISIBLE);
                 break;
             }
 
+        }
+    }
+
+    public boolean isNumeric(String str) {
+        try {
+            Double.parseDouble(str);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
         }
     }
 }
