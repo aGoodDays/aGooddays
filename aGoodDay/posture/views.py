@@ -39,6 +39,7 @@ class DeviceDetail(generics.ListAPIView):
         elif start_date is not None and end_date is not None:
             start_date = datetime.strptime(start_date, '%Y-%m-%d').date()
             end_date = datetime.strptime(end_date, '%Y-%m-%d').date()
+            end_date = end_date + timedelta(days=1)
             query = Device.objects.filter(device_id=device_id, date__range=[start_date, end_date])
         return query
         
