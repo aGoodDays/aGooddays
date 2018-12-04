@@ -47,7 +47,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public static Vibrator vibrator;
 
     private LinearLayout layout_bluetooth, layout_level, layout_controller, layout_mode;
-    private Button btn_connect, btn_level1, btn_level2, btn_level3, btn_on, btn_stop, btn_off, btn_refresh, btn_server, btn_local, btn_view, btn_test;
+    private Button btn_connect, btn_level1, btn_level2, btn_level3, btn_on, btn_stop, btn_off, btn_refresh, btn_server, btn_local, btn_view;
     private TextView textView_device_id;
     private ListView listView;
 
@@ -105,7 +105,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         btn_off = (Button) findViewById(R.id.main_btn_off);
         btn_refresh = (Button) findViewById(R.id.main_btn_refresh);
         btn_view = (Button) findViewById(R.id.main_btn_view);
-        btn_test = (Button) findViewById(R.id.main_btn_test);
         textView_device_id = (TextView) findViewById(R.id.main_textview_device_id);
         listView = (ListView) findViewById(R.id.main_listview);
 
@@ -134,7 +133,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         btn_server.setOnClickListener(this);
         btn_local.setOnClickListener(this);
         btn_view.setOnClickListener(this);
-        btn_test.setOnClickListener(this);
+
 
         //Bluetooth Setting
         bluetoothSPP = new BluetoothSPP(this);
@@ -149,6 +148,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 if (message.contains("ID")) {
                     textView_device_id.setText(message.substring(2));
                     device_id = textView_device_id.getText().toString();
+                    btn_connect.setText("DISCONNECT");
+                    btn_view.setVisibility(View.VISIBLE);
+                    layout_mode.setVisibility(View.VISIBLE);
                 }
                 Log.d("receiver ", message);
                 vibrator.vibrate(100);
@@ -159,9 +161,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         bluetoothSPP.setBluetoothConnectionListener(new BluetoothSPP.BluetoothConnectionListener() {
             @Override
             public void onDeviceConnected(String name, String address) { //연결되었을 때
-                btn_connect.setText("DISCONNECT");
-                btn_view.setVisibility(View.VISIBLE);
-                layout_mode.setVisibility(View.VISIBLE);
+
 
             }
 
@@ -336,12 +336,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 Intent intent = new Intent(this, ViewActivity.class);
                 intent.putExtra("device_id", textView_device_id.getText().toString());
                 startActivity(intent);
-                break;
-            }
-            case R.id.main_btn_test: {
-                textView_device_id.setText("1001180101");
-                device_id = "1001180101";
-                layout_level.setVisibility(View.VISIBLE);
                 break;
             }
 
