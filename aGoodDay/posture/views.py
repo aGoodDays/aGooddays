@@ -9,11 +9,14 @@ from datetime import date, datetime, timedelta
 
 
 """
-@file   aGoodDay.posture.views
-@brief  Recevied device_id and start_date, end_date from GET request, and return user posture data
+@file aGoodDay.posture.views
+@brief views.py는 클라이언트의 요청을 처리하고, 그 결과를 사용자에게 보여줄 수 있도록 Templete에게 전달하는 역할을 한다. 보통 MVC 패턴의 Controller의 역할을 한다고 생각하면 편하다.
 @author jeje(las9897@gmail.com)
-@param  int device_id | string start_date | string end_date
-@return array
+"""
+
+"""
+@file .DeviceDetail
+@brief ID가 device_id인 클라이언트가 Device 테이블의 데이터를 요청할 때 호출되는 클래스. Request 객체에 숫자형 date가 포함 되어있으면 오늘을 기준으로 date 일 전까지의 데이터를 반환한다. 또는 Request객체에 문자열 start_date, end_date가 있으면 이를 DATE 타입으로 변환 후, 그 사이에 있는 날짜에 해당하는 데이터를 반환한다.
 """
 class DeviceDetail(generics.ListAPIView):
     serializer_class = DeviceSerializer
@@ -42,42 +45,22 @@ class DeviceDetail(generics.ListAPIView):
             end_date = end_date + timedelta(days=1)
             query = Device.objects.filter(device_id=device_id, date__range=[start_date, end_date])
         return query
-        
-    # def create(self, request, *args, **kwargs):
-    #     serializer = self.get_serializer(data=request.data, many=isinstance(request.data,list))
-    #     serializer.is_valid(raise_exception=True)
-    #     self.perform_create(serializer)
-    #     headers = self.get_success_headers(serializer.data)
-    #     return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
 """
-@brief  after receiving dataform from POST request, insert posture to MySQL.
-        Both single data and multi data are possible.
-@author jeje(las9897@gmail.com)
-@param  jsonarray dataform
-@return int responsecode
+@file .PostureDetail
+@brief ID가 device_id인 클라이언트가 가공된 데이터를 요청할 때 사용된다.
 """
-'''
-class DeviceInsert(generics.CreateAPIView):
-    queryset = Device.objects.all()
-    serializer_class = DeviceSerializer
-
-    def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data, many=isinstance(request.data,list))
-        serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
-        headers = self.get_success_headers(serializer.data)
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
-'''
 
 class PostureDetail(generics.ListCreateAPIView):
     serializer_class = PostureSerializer
     def get_queryset(self):
         device_id = self.kwargs['device_id']
         return Posture.objects.filter(device_id=device_id)
-
     
-
+"""
+@file .PostureUpdate
+@brief Device 테이블의 데이터가 추가되어서, 가공 결과가 바뀌었을 때 호출되어 기존 Posture 테이블을 업데이트한다.
+"""
 class PostureUpdate(generics.RetrieveUpdateAPIView):
     queryset = Posture.objects.all()
     serializer_class = PostureSerializer

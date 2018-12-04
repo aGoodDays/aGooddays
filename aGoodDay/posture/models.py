@@ -3,9 +3,9 @@ from django.db import models
 
 """
 @file   aGoodDay.posture.models
-@brief  Data class used to collect or display data 
-        The primary key is omitted, but exists as an id.
-        The Device is the data, the PostureData model is the processed data
+@brief  데이터를 수집하거나 표시하는데 사용되는 데이터 클래스
+        기본 키는 생략되었으며, 테이블 상에서 ID로 존재합니다.
+        Posture 테이블은 처리된 데이터를 보관하기 위해서 만들었습니다.
 @author jeje(las9897@gmail.com)
 """
 

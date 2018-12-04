@@ -5,7 +5,7 @@ from posture.models import Device, Posture
 
 """
 @file   aGoodDay.posture.serializers
-@brief  Convert query to json, and reverse
+@brief  서버, 데이터베이스, 안드로이드 등 다양한 환경에서 데이터를 주고 받으려면 동일한 데이터 구조를 가져야하는데, Serializer는 동일한 데이터 구조로 만들어주는 역할을 한다.
 @author jeje(las9897@gmail.com)
 """
 class DeviceSerializer(serializers.ModelSerializer):
