@@ -50,6 +50,11 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+/**
+ * @file jongseol.agoodday.ViewActivity.java
+ * @brief MySQL에 저장되어있는 자세 데이터를 가공해서 보여주는 액티비티 입니다.
+ * @author jeje (las9897@gmail.com)
+ */
 public class ViewActivity extends AppCompatActivity implements View.OnClickListener {
 
 
@@ -58,15 +63,17 @@ public class ViewActivity extends AppCompatActivity implements View.OnClickListe
     private ListView listView;
     private LineChart lineChart;
 
-    public static final TimeZone timezone = TimeZone.getTimeZone("Asia/Seoul");
-    public static final SimpleDateFormat simpledateformat = new SimpleDateFormat("yyyy-MM-dd");
     private APIInterface apiInterface;
     private ArrayList<Posture> postureArrayList;
-    private PostureAdapter postureAdapter;
 
+    private PostureAdapter postureAdapter;
     private String device_id;
 
 
+    /**
+     * @brief ViewActivity가 처음 실행되었을 때 수행되는 메소드입니다. 전달된 Intent로 id값을 받아오거나, 기본적인 View와 API들을 세팅합니다.
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -92,9 +99,12 @@ public class ViewActivity extends AppCompatActivity implements View.OnClickListe
         btn_2week.setOnClickListener(this);
         btn_4week.setOnClickListener(this);
         btn_search.setOnClickListener(this);
+
+        /** @brief ViewActivity를 실행했을 때 일주일 치의 데이터를 보여주기 위해서 추가했습니다. */
         btn_week.performClick();
 
 
+        /** @brief ViewActivity에서도 진동을 감지할 수 있도록 만들었습니다. */
         MainActivity.myActivity.bluetoothSPP.setOnDataReceivedListener(new BluetoothSPP.OnDataReceivedListener() {
             @Override
             public void onDataReceived(byte[] data, String message) {
@@ -107,7 +117,48 @@ public class ViewActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
+    /**
+     * @brief 많은 버튼을 편하게 관리하기 위해서, 해당하는 View의 id 값을 통해서 관리합니다.
+     * @param v
+     */
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            /** @brief 1주일, 2주일, 한달(4주일)의 데이터를 가져옵니다. Delay 메소드를 사용하여 지속적인 버튼 클릭을 방지합니다. */
+            case R.id.view_btn_week: {
+                getData(7);
+                Delay();
+                break;
+            }
+            case R.id.view_btn_2week: {
+                getData(14);
+                Delay();
+                break;
+            }
+            case R.id.view_btn_4week: {
+                getData(28);
+                Delay();
+                break;
+            }
+            /** @brief 지정한 날짜의 데이터를 가져옵니다. 날짜가 잘못될 경우 Toast를 날려 사용자에게 수정을 유도합니다. Delay 메소드를 사용하여 지속적인 버튼 클릭을 방지합니다. */
+            case R.id.view_btn_search: {
+                if (mask_start_date.getText().toString().contains(" ") || mask_end_date.getText().toString().contains(" ")) {
+                    Toast.makeText(this, "올바른 형식으로 입력해주세요. \n예) YYYY-MM-DD", Toast.LENGTH_SHORT).show();
+                } else {
+                    getData(mask_start_date.getText().toString(), mask_end_date.getText().toString());
+                    Delay();
+                }
+                break;
+            }
 
+        }
+    }
+
+    /**
+     * @brief 서버와 통신해서 JsonArray 타입의 데이터를 가져와 그래프와 리스트뷰에 뿌려주는 메소드입니다.
+     *         매개변수를 int 타입으로 줘서 오늘을 기준으로 며칠 동안의 데이터를 보여줄 것인지 조절할 수 있습니다.
+     * @param date
+     */
     public void getData(int date) {
         postureArrayList.clear();
         Call<JsonArray> call = apiInterface.getPostureData(device_id, date);
@@ -117,7 +168,7 @@ public class ViewActivity extends AppCompatActivity implements View.OnClickListe
                 if (response.isSuccessful()) {
                     Log.d("getData", "Success");
                     JsonArray jsonArray = response.body();
-                    String today = simpledateformat.format(new Date());
+                    String today = MainActivity.simpledateformat.format(new Date());
                     Posture posture = new Posture(device_id, today);
                     for (JsonElement e : jsonArray) {
                         if (!today.equals(e.getAsJsonObject().get("date").getAsString())) { // 오늘 날짜가 아니라면
@@ -164,6 +215,11 @@ public class ViewActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
+    /**
+     * @brief 위의 getData와 같은 기능을 수행하지만, 시작 날짜와 끝 날짜를 지정해서 그 사이에 있는 데이터를 보여주는 메소드입니다.
+     * @param start_date
+     * @param end_date
+     */
     public void getData(String start_date, String end_date) {
         postureArrayList.clear();
         Call<JsonArray> call = apiInterface.getPostureData(device_id, start_date, end_date);
@@ -173,7 +229,7 @@ public class ViewActivity extends AppCompatActivity implements View.OnClickListe
                 if (response.isSuccessful()) {
                     Log.d("getData", "Success");
                     JsonArray jsonArray = response.body();
-                    String today = simpledateformat.format(new Date());
+                    String today = MainActivity.simpledateformat.format(new Date());
                     Posture posture = new Posture(device_id, today);
                     for (JsonElement e : jsonArray) {
                         if (!today.equals(e.getAsJsonObject().get("date").getAsString())) { // 오늘 날짜가 아니라면
@@ -219,6 +275,10 @@ public class ViewActivity extends AppCompatActivity implements View.OnClickListe
         });
     }
 
+    /**
+     * @brief getData 메소드에서 호출하는 그래프를 그려주는 메소드입니다. 그래프를 그릴 때는 MPAndroidChart를 사용하였습니다.
+     *         그래프에 사용되는 데이터는 리스트뷰에 뿌리는 데이터 리스트를 사용하였습니다.
+     */
     public void makeGraph() {
         ArrayList<Entry> entries = new ArrayList<>();
         final ArrayList<String> labels = new ArrayList<>();
@@ -227,7 +287,7 @@ public class ViewActivity extends AppCompatActivity implements View.OnClickListe
             labels.add(postureArrayList.get(i).date);
         }
 
-
+        //Graph Setting
         LineDataSet dataSet = new LineDataSet(entries, "Posture Data");
         dataSet.setColor(Color.parseColor("#008577"));//color
         dataSet.setLineWidth(2);
@@ -259,12 +319,19 @@ public class ViewActivity extends AppCompatActivity implements View.OnClickListe
         LineData lineData = new LineData(dataSet);
         lineChart.setData(lineData);
         lineChart.invalidate(); // refresh
+
+        //Marker Setting
         Marker marker = new Marker(this, R.layout.item_marker);
         marker.setChartView(lineChart);
         lineChart.setMarker(marker);
 
     }
 
+    /**
+     * @brief ViewActivity는 ScrollVIew라서 스크롤할 때 ListVIew와 충돌이 일어납니다.
+     *         그래서 ListView의 스크롤을 없애고, 생성되는 데이터들의 크기를 계산해서 ListView의 height 값을 조절하는 방법을 사용했습니다.
+     * @param listView
+     */
     public static void setListViewHeightBasedOnChildren(ListView listView) {
         ListAdapter listAdapter = listView.getAdapter();
         if (listAdapter == null) {
@@ -287,54 +354,27 @@ public class ViewActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.view_btn_week: {
-                getData(7);
-                Delay(R.id.view_btn_week);
-                break;
-            }
-            case R.id.view_btn_2week: {
-                getData(14);
-                Delay(R.id.view_btn_2week);
-                break;
-            }
-            case R.id.view_btn_4week: {
-                getData(28);
-                Delay(R.id.view_btn_4week);
-                break;
-            }
-            case R.id.view_btn_search: {
-                if (mask_start_date.getText().toString().contains(" ") || mask_end_date.getText().toString().contains(" ")) {
-                    Toast.makeText(this, "올바른 형식으로 입력해주세요. \n예) YYYY-MM-DD", Toast.LENGTH_SHORT).show();
-                } else {
-                    getData(mask_start_date.getText().toString(), mask_end_date.getText().toString());
-                    Delay(R.id.view_btn_search);
-                }
-                break;
-            }
-
-        }
-    }
-
-    public void Delay(int btn_id) {
-        Button btn = (Button) findViewById(btn_id);
-        btn.setEnabled(false);
+    /**
+     * @brief 서버와 통신하는 버튼들을 계속 누르다보면 데이터가 꼬이는 경우가 생겼습니다.
+     *         이를 방지하고자 버튼을 눌렀을 때 3초 동안의 딜레이를 만들어서 다른 버튼을 누르지 못하게 했습니다.
+     */
+    public void Delay() {
+        btn_week.setEnabled(false);
+        btn_search.setEnabled(false);
+        btn_2week.setEnabled(false);
+        btn_4week.setEnabled(false);
         Handler handler = new Handler();
-        handler.postDelayed(new PostureHandler(btn_id), 5000);
+        handler.postDelayed(new PostureHandler(), 3000);
     }
 
+    /** @brief Delay에 사용될 핸들러입니다. */
     private class PostureHandler implements Runnable {
-        Button button;
-
-        public PostureHandler(int btn_id) {
-            this.button = (Button) findViewById(btn_id);
-        }
-
         @Override
         public void run() {
-            button.setEnabled(true);
+            btn_week.setEnabled(true);
+            btn_search.setEnabled(true);
+            btn_2week.setEnabled(true);
+            btn_4week.setEnabled(true);
         }
     }
 }

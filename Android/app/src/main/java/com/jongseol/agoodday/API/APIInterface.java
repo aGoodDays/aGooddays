@@ -17,7 +17,6 @@ public interface APIInterface {
 
     /**
      * @brief 오늘을 기준으로 입력된 date 일 전까지의 데이터를 불러옵니다. 7일, 14일, 28일의 데이터를 가져올 수 있도록 버튼을 만들어서 사용합니다.
-     * @author jeje (las9897@gmail.com)
      * @param device_id
      * @param date
      * @return Call
@@ -28,7 +27,6 @@ public interface APIInterface {
 
     /**
      * @brief 날짜의 범위를 지정하여 데이터를 불러옵니다.
-     * @author jeje (las9897@gmail.com)
      * @param device_id
      * @param start_date
      * @param end_date
