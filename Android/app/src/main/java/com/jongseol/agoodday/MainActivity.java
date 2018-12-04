@@ -175,9 +175,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     if (message.contains("ID")) {
                         textView_device_id.setText(message.substring(2));
                         device_id = textView_device_id.getText().toString();
-                        btn_connect.setText("DISCONNECT");
-                        btn_view.setVisibility(View.VISIBLE);
-                        layout_mode.setVisibility(View.VISIBLE);
+
                     }
                     vibrator.vibrate(100);
                 }
@@ -188,6 +186,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 @Override
                 public void onDeviceConnected(String name, String address) { //연결되었을 때
                     Toast.makeText(getApplicationContext(), "Connect", Toast.LENGTH_SHORT).show();
+                    btn_connect.setText("DISCONNECT");
+                    btn_view.setVisibility(View.VISIBLE);
+                    layout_mode.setVisibility(View.VISIBLE);
+                    textView_device_id.setText("ID를 불러오는 중입니다.");
                 }
 
                 @Override
