@@ -189,7 +189,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     btn_connect.setText("DISCONNECT");
                     btn_view.setVisibility(View.VISIBLE);
                     layout_mode.setVisibility(View.VISIBLE);
-                    textView_device_id.setText("ID를 불러오는 중입니다.");
                 }
 
                 @Override
